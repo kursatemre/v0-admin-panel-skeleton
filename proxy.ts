@@ -14,13 +14,11 @@ export function middleware(request: NextRequest) {
 
     // If no IPs are configured, allow all (for development)
     if (allowedIps.length === 0) {
-      console.log("[v0] No ALLOWED_TV_IPS configured, allowing all access to /tv")
       return NextResponse.next()
     }
 
     // Check if client IP is in the allowed list
     if (!allowedIps.includes(clientIp)) {
-      console.log(`[v0] Access denied to /tv from IP: ${clientIp}`)
       return new NextResponse("Access Denied: Your IP address is not authorized to view this page.", {
         status: 403,
         headers: {
@@ -28,8 +26,6 @@ export function middleware(request: NextRequest) {
         },
       })
     }
-
-    console.log(`[v0] Access granted to /tv from IP: ${clientIp}`)
   }
 
   return NextResponse.next()
