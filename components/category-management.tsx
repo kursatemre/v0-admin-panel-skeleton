@@ -1,15 +1,20 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, FolderOpen, Pencil, Trash2, X } from "lucide-react"
+import { Plus, FolderOpen, Pencil, Trash2, X, Upload } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
+import { upload } from "@vercel/blob/client"
+import Image from "next/image"
 
 type Category = {
   id: string
   name: string
   display_order: number
+  image_url?: string | null
   product_count?: number
 }
 
@@ -17,7 +22,9 @@ export function CategoryManagement() {
   const [categories, setCategories] = useState<Category[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [formData, setFormData] = useState({ name: "", display_order: "" })
+  const [formData, setFormData] = useState({ name: "", display_order: "", image_url: "" })
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
 
   const supabase = getSupabaseBrowserClient()
@@ -34,7 +41,6 @@ export function CategoryManagement() {
       return
     }
 
-    // Get product counts for each category
     const categoriesWithCounts = await Promise.all(
       (data || []).map(async (cat) => {
         const { count } = await supabase
@@ -56,26 +62,55 @@ export function CategoryManagement() {
       setFormData({
         name: category.name,
         display_order: category.display_order.toString(),
+        image_url: category.image_url || "",
       })
+      setImagePreview(category.image_url || "")
     } else {
       setEditingCategory(null)
-      setFormData({ name: "", display_order: (categories.length + 1).toString() })
+      setFormData({ name: "", display_order: (categories.length + 1).toString(), image_url: "" })
+      setImagePreview("")
     }
+    setImageFile(null)
     setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setEditingCategory(null)
-    setFormData({ name: "", display_order: "" })
+    setFormData({ name: "", display_order: "", image_url: "" })
+    setImageFile(null)
+    setImagePreview("")
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleSave = async () => {
     setIsLoading(true)
     try {
+      let imageUrl = formData.image_url
+
+      if (imageFile) {
+        const blob = await upload(imageFile.name, imageFile, {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+        })
+        imageUrl = blob.url
+      }
+
       const categoryData = {
         name: formData.name,
         display_order: Number.parseInt(formData.display_order) || 0,
+        image_url: imageUrl,
       }
 
       if (editingCategory) {
@@ -91,7 +126,6 @@ export function CategoryManagement() {
       await loadCategories()
       handleCloseModal()
     } catch (error) {
-      console.error("[v0] Error saving category:", error)
       alert("Kategori kaydedilirken bir hata oluştu")
     } finally {
       setIsLoading(false)
@@ -131,11 +165,22 @@ export function CategoryManagement() {
         {categories.map((category, index) => (
           <Card key={category.id} className="p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
-              <div
-                className={`w-12 h-12 rounded-lg ${colors[index % colors.length]} flex items-center justify-center flex-shrink-0`}
-              >
-                <FolderOpen className="w-6 h-6 text-white" />
-              </div>
+              {category.image_url ? (
+                <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 relative">
+                  <Image
+                    src={category.image_url || "/placeholder.svg"}
+                    alt={category.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div
+                  className={`w-12 h-12 rounded-lg ${colors[index % colors.length]} flex items-center justify-center flex-shrink-0`}
+                >
+                  <FolderOpen className="w-6 h-6 text-white" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-lg mb-1">{category.name}</h3>
                 <p className="text-sm text-muted-foreground">{category.product_count} ürün</p>
@@ -180,6 +225,24 @@ export function CategoryManagement() {
                   placeholder="Kategori adını girin"
                   className="w-full px-4 py-2 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Kategori Görseli</label>
+                <div className="flex items-center gap-4">
+                  {imagePreview && (
+                    <div className="w-20 h-20 rounded-lg overflow-hidden relative border-2 border-border">
+                      <Image src={imagePreview || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                    </div>
+                  )}
+                  <label className="flex-1 cursor-pointer">
+                    <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-input rounded-lg hover:border-ring transition-colors">
+                      <Upload className="w-4 h-4" />
+                      <span className="text-sm">{imageFile ? imageFile.name : "Görsel Seç"}</span>
+                    </div>
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                  </label>
+                </div>
               </div>
 
               <div className="space-y-2">

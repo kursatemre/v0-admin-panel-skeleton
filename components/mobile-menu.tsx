@@ -16,6 +16,7 @@ type Product = {
 type Category = {
   id: string
   name: string
+  image_url?: string | null
   products: Product[]
 }
 
@@ -23,9 +24,36 @@ type MobileMenuProps = {
   categories: Category[]
   backgroundColor: string
   accentColor: string
+  backgroundPattern: string
 }
 
-export function MobileMenu({ categories, backgroundColor, accentColor }: MobileMenuProps) {
+const getPatternStyle = (pattern: string, color: string) => {
+  const opacity = "0.03"
+  switch (pattern) {
+    case "dots":
+      return {
+        backgroundImage: `radial-gradient(circle, ${color}${opacity} 1px, transparent 1px)`,
+        backgroundSize: "20px 20px",
+      }
+    case "grid":
+      return {
+        backgroundImage: `linear-gradient(${color}${opacity} 1px, transparent 1px), linear-gradient(90deg, ${color}${opacity} 1px, transparent 1px)`,
+        backgroundSize: "30px 30px",
+      }
+    case "diagonal":
+      return {
+        backgroundImage: `repeating-linear-gradient(45deg, ${color}${opacity}, ${color}${opacity} 1px, transparent 1px, transparent 10px)`,
+      }
+    case "waves":
+      return {
+        backgroundImage: `repeating-radial-gradient(circle at 0 0, transparent 0, ${color}${opacity} 10px, transparent 20px)`,
+      }
+    default:
+      return {}
+  }
+}
+
+export function MobileMenu({ categories, backgroundColor, accentColor, backgroundPattern }: MobileMenuProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(categories.map((c) => c.id)))
 
   const toggleCategory = (categoryId: string) => {
@@ -38,8 +66,10 @@ export function MobileMenu({ categories, backgroundColor, accentColor }: MobileM
     setExpandedCategories(newExpanded)
   }
 
+  const patternStyle = getPatternStyle(backgroundPattern, accentColor)
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor }}>
+    <div className="min-h-screen" style={{ backgroundColor, ...patternStyle }}>
       {/* Header */}
       <div className="sticky top-0 z-10 backdrop-blur-lg border-b" style={{ backgroundColor: `${backgroundColor}f0` }}>
         <div className="max-w-4xl mx-auto px-4 py-6">
@@ -59,6 +89,16 @@ export function MobileMenu({ categories, backgroundColor, accentColor }: MobileM
               style={{ borderLeftWidth: "4px", borderLeftColor: accentColor }}
             >
               <div className="flex items-center gap-3">
+                {category.image_url && (
+                  <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                    <Image
+                      src={category.image_url || "/placeholder.svg"}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
                 <h2 className="text-xl font-bold">{category.name}</h2>
                 <span className="text-sm text-muted-foreground">({category.products.length})</span>
               </div>

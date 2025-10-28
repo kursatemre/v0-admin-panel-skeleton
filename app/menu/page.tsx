@@ -4,11 +4,11 @@ import { MobileMenu } from "@/components/mobile-menu"
 export default async function MenuPage() {
   const supabase = await getSupabaseServerClient()
 
-  // Load display settings
   const { data: settings } = await supabase.from("display_settings").select("*")
 
   const backgroundColor = settings?.find((s) => s.setting_key === "background_color")?.setting_value || "#ffffff"
   const accentColor = settings?.find((s) => s.setting_key === "accent_color")?.setting_value || "#ef4444"
+  const backgroundPattern = settings?.find((s) => s.setting_key === "background_pattern")?.setting_value || "none"
 
   // Load categories with products
   const { data: categories } = await supabase.from("categories").select("*").order("display_order")
@@ -29,5 +29,12 @@ export default async function MenuPage() {
     }),
   )
 
-  return <MobileMenu categories={categoriesWithProducts} backgroundColor={backgroundColor} accentColor={accentColor} />
+  return (
+    <MobileMenu
+      categories={categoriesWithProducts}
+      backgroundColor={backgroundColor}
+      accentColor={accentColor}
+      backgroundPattern={backgroundPattern}
+    />
+  )
 }

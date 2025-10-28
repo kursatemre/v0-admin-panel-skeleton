@@ -4,12 +4,21 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Palette } from "lucide-react"
+import { Palette, Grid3x3 } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
+
+const PATTERNS = [
+  { id: "none", name: "Desensiz", preview: "bg-white" },
+  { id: "dots", name: "Noktalar", preview: "bg-white" },
+  { id: "grid", name: "Izgara", preview: "bg-white" },
+  { id: "diagonal", name: "Çizgiler", preview: "bg-white" },
+  { id: "waves", name: "Dalgalar", preview: "bg-white" },
+]
 
 export function DisplaySettings() {
   const [backgroundColor, setBackgroundColor] = useState("#ffffff")
   const [accentColor, setAccentColor] = useState("#ef4444")
+  const [backgroundPattern, setBackgroundPattern] = useState("none")
   const [isLoading, setIsLoading] = useState(false)
 
   const supabase = getSupabaseBrowserClient()
@@ -22,7 +31,6 @@ export function DisplaySettings() {
     const { data, error } = await supabase.from("display_settings").select("*")
 
     if (error) {
-      console.error("[v0] Error loading settings:", error)
       return
     }
 
@@ -31,6 +39,8 @@ export function DisplaySettings() {
         setBackgroundColor(setting.setting_value)
       } else if (setting.setting_key === "accent_color") {
         setAccentColor(setting.setting_value)
+      } else if (setting.setting_key === "background_pattern") {
+        setBackgroundPattern(setting.setting_value)
       }
     })
   }
@@ -41,6 +51,7 @@ export function DisplaySettings() {
       const settings = [
         { setting_key: "background_color", setting_value: backgroundColor },
         { setting_key: "accent_color", setting_value: accentColor },
+        { setting_key: "background_pattern", setting_value: backgroundPattern },
       ]
 
       for (const setting of settings) {
@@ -51,7 +62,6 @@ export function DisplaySettings() {
 
       alert("Ayarlar başarıyla kaydedildi!")
     } catch (error) {
-      console.error("[v0] Error saving settings:", error)
       alert("Ayarlar kaydedilirken bir hata oluştu")
     } finally {
       setIsLoading(false)
@@ -96,6 +106,29 @@ export function DisplaySettings() {
                   <div className="w-full h-10 rounded-lg border-2 border-border" style={{ backgroundColor }} />
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Arka Plan Deseni</Label>
+            <p className="text-sm text-muted-foreground">Arka plana eklenecek dekoratif deseni seçin</p>
+            <div className="grid grid-cols-5 gap-3">
+              {PATTERNS.map((pattern) => (
+                <button
+                  key={pattern.id}
+                  onClick={() => setBackgroundPattern(pattern.id)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    backgroundPattern === pattern.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="aspect-square rounded bg-muted mb-2 flex items-center justify-center">
+                    <Grid3x3 className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-xs font-medium text-center">{pattern.name}</p>
+                </button>
+              ))}
             </div>
           </div>
 
