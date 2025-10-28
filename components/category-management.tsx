@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, FolderOpen, Pencil, Trash2, X, Upload } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
-import { upload } from "@vercel/blob/client"
 import Image from "next/image"
 
 type Category = {
@@ -102,11 +101,21 @@ export function CategoryManagement() {
       if (imageFile) {
         console.log("[v0] Uploading image:", imageFile.name)
         try {
-          const blob = await upload(imageFile.name, imageFile, {
-            access: "public",
-            handleUploadUrl: "/api/upload",
+          const formDataToSend = new FormData()
+          formDataToSend.append("file", imageFile)
+
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formDataToSend,
           })
-          imageUrl = blob.url
+
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || "Upload failed")
+          }
+
+          const data = await response.json()
+          imageUrl = data.url
           console.log("[v0] Image uploaded successfully:", imageUrl)
         } catch (uploadError) {
           console.error("[v0] Image upload failed:", uploadError)
