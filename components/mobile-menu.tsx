@@ -25,35 +25,69 @@ type MobileMenuProps = {
   backgroundColor: string
   accentColor: string
   backgroundPattern: string
+  fontSize: string
+  borderRadius: string
 }
 
 const getPatternStyle = (pattern: string, color: string) => {
-  const opacity = "0.03"
   switch (pattern) {
     case "dots":
       return {
-        backgroundImage: `radial-gradient(circle, ${color}${opacity} 1px, transparent 1px)`,
-        backgroundSize: "20px 20px",
+        backgroundImage: `radial-gradient(circle, ${color}30 2px, transparent 2px)`,
+        backgroundSize: "24px 24px",
       }
     case "grid":
       return {
-        backgroundImage: `linear-gradient(${color}${opacity} 1px, transparent 1px), linear-gradient(90deg, ${color}${opacity} 1px, transparent 1px)`,
+        backgroundImage: `linear-gradient(${color}20 1.5px, transparent 1.5px), linear-gradient(90deg, ${color}20 1.5px, transparent 1.5px)`,
         backgroundSize: "30px 30px",
       }
     case "diagonal":
       return {
-        backgroundImage: `repeating-linear-gradient(45deg, ${color}${opacity}, ${color}${opacity} 1px, transparent 1px, transparent 10px)`,
+        backgroundImage: `repeating-linear-gradient(45deg, ${color}15, ${color}15 2px, transparent 2px, transparent 12px)`,
       }
     case "waves":
       return {
-        backgroundImage: `repeating-radial-gradient(circle at 0 0, transparent 0, ${color}${opacity} 10px, transparent 20px)`,
+        backgroundImage: `repeating-radial-gradient(circle at 0 0, transparent 0, ${color}15 15px, transparent 30px)`,
       }
     default:
       return {}
   }
 }
 
-export function MobileMenu({ categories, backgroundColor, accentColor, backgroundPattern }: MobileMenuProps) {
+const getFontSizeMultiplier = (size: string) => {
+  switch (size) {
+    case "small":
+      return 0.9
+    case "large":
+      return 1.1
+    case "xlarge":
+      return 1.2
+    default:
+      return 1.0
+  }
+}
+
+const getBorderRadiusValue = (radius: string) => {
+  switch (radius) {
+    case "none":
+      return "0"
+    case "small":
+      return "0.375rem"
+    case "large":
+      return "1rem"
+    default:
+      return "0.5rem"
+  }
+}
+
+export function MobileMenu({
+  categories,
+  backgroundColor,
+  accentColor,
+  backgroundPattern,
+  fontSize,
+  borderRadius,
+}: MobileMenuProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(categories.map((c) => c.id)))
 
   const toggleCategory = (categoryId: string) => {
@@ -67,21 +101,27 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
   }
 
   const patternStyle = getPatternStyle(backgroundPattern, accentColor)
+  const fontMultiplier = getFontSizeMultiplier(fontSize)
+  const radiusValue = getBorderRadiusValue(borderRadius)
 
   return (
     <div className="min-h-screen" style={{ backgroundColor, ...patternStyle }}>
       {/* Header */}
       <div className="sticky top-0 z-10 backdrop-blur-lg border-b" style={{ backgroundColor: `${backgroundColor}f0` }}>
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-center text-balance">Menümüz</h1>
-          <p className="text-center text-muted-foreground mt-2">Lezzetli yemeklerimizi keşfedin</p>
+          <h1 className="text-3xl font-bold text-center text-balance" style={{ fontSize: `${3 * fontMultiplier}rem` }}>
+            Menümüz
+          </h1>
+          <p className="text-center text-muted-foreground mt-2" style={{ fontSize: `${1 * fontMultiplier}rem` }}>
+            Lezzetli yemeklerimizi keşfedin
+          </p>
         </div>
       </div>
 
       {/* Menu Content */}
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {categories.map((category) => (
-          <Card key={category.id} className="overflow-hidden">
+          <Card key={category.id} className="overflow-hidden" style={{ borderRadius: radiusValue }}>
             {/* Category Header */}
             <button
               onClick={() => toggleCategory(category.id)}
@@ -90,7 +130,10 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
             >
               <div className="flex items-center gap-3">
                 {category.image_url && (
-                  <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                  <div
+                    className="relative w-10 h-10 overflow-hidden flex-shrink-0"
+                    style={{ borderRadius: radiusValue }}
+                  >
                     <Image
                       src={category.image_url || "/placeholder.svg"}
                       alt={category.name}
@@ -99,8 +142,12 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
                     />
                   </div>
                 )}
-                <h2 className="text-xl font-bold">{category.name}</h2>
-                <span className="text-sm text-muted-foreground">({category.products.length})</span>
+                <h2 className="text-xl font-bold" style={{ fontSize: `${1.25 * fontMultiplier}rem` }}>
+                  {category.name}
+                </h2>
+                <span className="text-sm text-muted-foreground" style={{ fontSize: `${0.875 * fontMultiplier}rem` }}>
+                  ({category.products.length})
+                </span>
               </div>
               {expandedCategories.has(category.id) ? (
                 <ChevronUp className="w-5 h-5 text-muted-foreground" />
@@ -117,7 +164,10 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
                     <div className="flex gap-4">
                       {/* Product Image */}
                       {product.image_url && (
-                        <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                        <div
+                          className="relative w-24 h-24 flex-shrink-0 overflow-hidden bg-muted"
+                          style={{ borderRadius: radiusValue }}
+                        >
                           <Image
                             src={product.image_url || "/placeholder.svg"}
                             alt={product.name}
@@ -131,16 +181,24 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-1 text-balance">{product.name}</h3>
+                            <h3
+                              className="font-semibold text-lg mb-1 text-balance"
+                              style={{ fontSize: `${1.125 * fontMultiplier}rem` }}
+                            >
+                              {product.name}
+                            </h3>
                             {product.description && (
-                              <p className="text-sm text-muted-foreground leading-relaxed text-pretty">
+                              <p
+                                className="text-sm text-muted-foreground leading-relaxed text-pretty"
+                                style={{ fontSize: `${0.875 * fontMultiplier}rem` }}
+                              >
                                 {product.description}
                               </p>
                             )}
                           </div>
                           <div
                             className="font-bold text-lg whitespace-nowrap flex-shrink-0"
-                            style={{ color: accentColor }}
+                            style={{ color: accentColor, fontSize: `${1.125 * fontMultiplier}rem` }}
                           >
                             {product.price.toFixed(2)} ₺
                           </div>
@@ -151,7 +209,12 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
                 ))}
 
                 {category.products.length === 0 && (
-                  <div className="p-6 text-center text-muted-foreground">Bu kategoride henüz ürün bulunmuyor</div>
+                  <div
+                    className="p-6 text-center text-muted-foreground"
+                    style={{ fontSize: `${1 * fontMultiplier}rem` }}
+                  >
+                    Bu kategoride henüz ürün bulunmuyor
+                  </div>
                 )}
               </div>
             )}
@@ -159,14 +222,19 @@ export function MobileMenu({ categories, backgroundColor, accentColor, backgroun
         ))}
 
         {categories.length === 0 && (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">Henüz kategori eklenmemiş</p>
+          <Card className="p-12 text-center" style={{ borderRadius: radiusValue }}>
+            <p className="text-muted-foreground" style={{ fontSize: `${1 * fontMultiplier}rem` }}>
+              Henüz kategori eklenmemiş
+            </p>
           </Card>
         )}
       </div>
 
       {/* Footer */}
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
+      <div
+        className="max-w-4xl mx-auto px-4 py-8 text-center text-sm text-muted-foreground"
+        style={{ fontSize: `${0.875 * fontMultiplier}rem` }}
+      >
         <p>Afiyet olsun!</p>
       </div>
     </div>

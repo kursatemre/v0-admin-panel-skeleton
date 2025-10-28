@@ -100,11 +100,20 @@ export function CategoryManagement() {
       let imageUrl = formData.image_url
 
       if (imageFile) {
-        const blob = await upload(imageFile.name, imageFile, {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-        })
-        imageUrl = blob.url
+        console.log("[v0] Uploading image:", imageFile.name)
+        try {
+          const blob = await upload(imageFile.name, imageFile, {
+            access: "public",
+            handleUploadUrl: "/api/upload",
+          })
+          imageUrl = blob.url
+          console.log("[v0] Image uploaded successfully:", imageUrl)
+        } catch (uploadError) {
+          console.error("[v0] Image upload failed:", uploadError)
+          alert("Görsel yüklenirken bir hata oluştu: " + (uploadError as Error).message)
+          setIsLoading(false)
+          return
+        }
       }
 
       const categoryData = {
@@ -113,20 +122,30 @@ export function CategoryManagement() {
         image_url: imageUrl,
       }
 
+      console.log("[v0] Saving category:", categoryData)
+
       if (editingCategory) {
         const { error } = await supabase.from("categories").update(categoryData).eq("id", editingCategory.id)
 
-        if (error) throw error
+        if (error) {
+          console.error("[v0] Update error:", error)
+          throw error
+        }
       } else {
         const { error } = await supabase.from("categories").insert(categoryData)
 
-        if (error) throw error
+        if (error) {
+          console.error("[v0] Insert error:", error)
+          throw error
+        }
       }
 
+      console.log("[v0] Category saved successfully")
       await loadCategories()
       handleCloseModal()
     } catch (error) {
-      alert("Kategori kaydedilirken bir hata oluştu")
+      console.error("[v0] Save error:", error)
+      alert("Kategori kaydedilirken bir hata oluştu: " + (error as Error).message)
     } finally {
       setIsLoading(false)
     }

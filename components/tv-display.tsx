@@ -23,35 +23,69 @@ type TVDisplayProps = {
   backgroundColor: string
   accentColor: string
   backgroundPattern: string
+  fontSize: string
+  borderRadius: string
 }
 
 const getPatternStyle = (pattern: string, color: string) => {
-  const opacity = "0.05"
   switch (pattern) {
     case "dots":
       return {
-        backgroundImage: `radial-gradient(circle, ${color}${opacity} 1px, transparent 1px)`,
-        backgroundSize: "20px 20px",
+        backgroundImage: `radial-gradient(circle, ${color}25 3px, transparent 3px)`,
+        backgroundSize: "40px 40px",
       }
     case "grid":
       return {
-        backgroundImage: `linear-gradient(${color}${opacity} 1px, transparent 1px), linear-gradient(90deg, ${color}${opacity} 1px, transparent 1px)`,
-        backgroundSize: "30px 30px",
+        backgroundImage: `linear-gradient(${color}20 2px, transparent 2px), linear-gradient(90deg, ${color}20 2px, transparent 2px)`,
+        backgroundSize: "50px 50px",
       }
     case "diagonal":
       return {
-        backgroundImage: `repeating-linear-gradient(45deg, ${color}${opacity}, ${color}${opacity} 1px, transparent 1px, transparent 10px)`,
+        backgroundImage: `repeating-linear-gradient(45deg, ${color}15, ${color}15 3px, transparent 3px, transparent 20px)`,
       }
     case "waves":
       return {
-        backgroundImage: `repeating-radial-gradient(circle at 0 0, transparent 0, ${color}${opacity} 10px, transparent 20px)`,
+        backgroundImage: `repeating-radial-gradient(circle at 0 0, transparent 0, ${color}15 20px, transparent 40px)`,
       }
     default:
       return {}
   }
 }
 
-export function TVDisplay({ categories, backgroundColor, accentColor, backgroundPattern }: TVDisplayProps) {
+const getFontSizeMultiplier = (size: string) => {
+  switch (size) {
+    case "small":
+      return 0.9
+    case "large":
+      return 1.1
+    case "xlarge":
+      return 1.2
+    default:
+      return 1.0
+  }
+}
+
+const getBorderRadiusValue = (radius: string) => {
+  switch (radius) {
+    case "none":
+      return "0"
+    case "small":
+      return "0.75rem"
+    case "large":
+      return "2rem"
+    default:
+      return "1.5rem"
+  }
+}
+
+export function TVDisplay({
+  categories,
+  backgroundColor,
+  accentColor,
+  backgroundPattern,
+  fontSize,
+  borderRadius,
+}: TVDisplayProps) {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0)
 
   useEffect(() => {
@@ -72,6 +106,8 @@ export function TVDisplay({ categories, backgroundColor, accentColor, background
 
   const currentCategory = categories[currentCategoryIndex]
   const patternStyle = getPatternStyle(backgroundPattern, accentColor)
+  const fontMultiplier = getFontSizeMultiplier(fontSize)
+  const radiusValue = getBorderRadiusValue(borderRadius)
 
   return (
     <div className="min-h-screen flex flex-col relative" style={{ backgroundColor, ...patternStyle }}>
@@ -80,8 +116,8 @@ export function TVDisplay({ categories, backgroundColor, accentColor, background
         <div className="flex items-center justify-center gap-8">
           {currentCategory.image_url && (
             <div
-              className="relative w-32 h-32 rounded-2xl overflow-hidden border-4"
-              style={{ borderColor: accentColor }}
+              className="relative w-32 h-32 overflow-hidden border-4"
+              style={{ borderColor: accentColor, borderRadius: radiusValue }}
             >
               <Image
                 src={currentCategory.image_url || "/placeholder.svg"}
@@ -92,10 +128,15 @@ export function TVDisplay({ categories, backgroundColor, accentColor, background
             </div>
           )}
           <div>
-            <h1 className="text-7xl font-bold text-balance" style={{ color: accentColor }}>
+            <h1
+              className="text-7xl font-bold text-balance"
+              style={{ color: accentColor, fontSize: `${7 * fontMultiplier}rem` }}
+            >
               {currentCategory.name}
             </h1>
-            <p className="text-3xl text-muted-foreground mt-2">{currentCategory.products.length} Ürün</p>
+            <p className="text-3xl text-muted-foreground mt-2" style={{ fontSize: `${3 * fontMultiplier}rem` }}>
+              {currentCategory.products.length} Ürün
+            </p>
           </div>
         </div>
       </div>
@@ -106,8 +147,8 @@ export function TVDisplay({ categories, backgroundColor, accentColor, background
           {currentCategory.products.slice(0, 6).map((product) => (
             <div
               key={product.id}
-              className="bg-card rounded-3xl overflow-hidden shadow-2xl flex flex-col border-4"
-              style={{ borderColor: `${accentColor}30` }}
+              className="bg-card overflow-hidden shadow-2xl flex flex-col border-4"
+              style={{ borderColor: `${accentColor}30`, borderRadius: radiusValue }}
             >
               {/* Product Image */}
               <div className="relative h-80 bg-muted">
@@ -127,18 +168,29 @@ export function TVDisplay({ categories, backgroundColor, accentColor, background
 
               {/* Product Info */}
               <div className="flex-1 p-8 flex flex-col">
-                <h3 className="text-4xl font-bold mb-4 text-balance leading-tight">{product.name}</h3>
+                <h3
+                  className="text-4xl font-bold mb-4 text-balance leading-tight"
+                  style={{ fontSize: `${4 * fontMultiplier}rem` }}
+                >
+                  {product.name}
+                </h3>
                 {product.description && (
-                  <p className="text-xl text-muted-foreground leading-relaxed mb-6 flex-1 text-pretty line-clamp-2">
+                  <p
+                    className="text-xl text-muted-foreground leading-relaxed mb-6 flex-1 text-pretty line-clamp-2"
+                    style={{ fontSize: `${1.25 * fontMultiplier}rem` }}
+                  >
                     {product.description}
                   </p>
                 )}
                 <div className="mt-auto">
                   <div
-                    className="flex items-center justify-center gap-4 py-6 px-8 rounded-2xl"
-                    style={{ backgroundColor: `${accentColor}15` }}
+                    className="flex items-center justify-center gap-4 py-6 px-8"
+                    style={{ backgroundColor: `${accentColor}15`, borderRadius: radiusValue }}
                   >
-                    <span className="text-5xl font-bold" style={{ color: accentColor }}>
+                    <span
+                      className="text-5xl font-bold"
+                      style={{ color: accentColor, fontSize: `${5 * fontMultiplier}rem` }}
+                    >
                       {product.price.toFixed(2)} ₺
                     </span>
                   </div>
@@ -163,7 +215,7 @@ export function TVDisplay({ categories, backgroundColor, accentColor, background
             />
           ))}
         </div>
-        <p className="text-center text-2xl text-muted-foreground mt-4">
+        <p className="text-center text-2xl text-muted-foreground mt-4" style={{ fontSize: `${2 * fontMultiplier}rem` }}>
           {currentCategoryIndex + 1} / {categories.length}
         </p>
       </div>
