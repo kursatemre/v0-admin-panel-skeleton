@@ -255,26 +255,53 @@ export function DisplaySettings() {
     description,
     value,
     onChange,
-  }: { label: string; description: string; value: string; onChange: (value: string) => void }) => (
-    <div className="space-y-3">
-      <Label className="text-base font-medium">{label}</Label>
-      <p className="text-sm text-muted-foreground">{description}</p>
-      <div className="flex items-center gap-4">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-12 w-20 rounded-lg border-2 border-border cursor-pointer"
-        />
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-mono text-muted-foreground">{value}</span>
-            <div className="w-full h-10 rounded-lg border-2 border-border" style={{ backgroundColor: value }} />
+  }: { label: string; description: string; value: string; onChange: (value: string) => void }) => {
+    const [hexInput, setHexInput] = useState(value)
+
+    useEffect(() => {
+      setHexInput(value)
+    }, [value])
+
+    const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value
+      setHexInput(newValue)
+
+      // Validate hex color (with or without #)
+      const hexRegex = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+      if (hexRegex.test(newValue)) {
+        const formattedHex = newValue.startsWith("#") ? newValue : `#${newValue}`
+        onChange(formattedHex)
+      }
+    }
+
+    return (
+      <div className="space-y-3">
+        <Label className="text-base font-medium">{label}</Label>
+        <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="flex items-center gap-4">
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="h-12 w-20 rounded-lg border-2 border-border cursor-pointer"
+          />
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={hexInput}
+                onChange={handleHexChange}
+                placeholder="#000000"
+                className="font-mono text-sm w-32"
+                maxLength={7}
+              />
+              <div className="flex-1 h-10 rounded-lg border-2 border-border" style={{ backgroundColor: value }} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className="space-y-6">
