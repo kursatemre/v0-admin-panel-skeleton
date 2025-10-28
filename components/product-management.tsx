@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Search, Pencil, Trash2, X, Upload } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
-import { put } from "@vercel/blob"
 
 type Product = {
   id: string
@@ -109,12 +108,21 @@ export function ProductManagement() {
     try {
       let imageUrl = editingProduct?.image_url
 
-      // Upload image if provided
       if (formData.image) {
-        const blob = await put(formData.image.name, formData.image, {
-          access: "public",
+        const formDataToSend = new FormData()
+        formDataToSend.append("file", formData.image)
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formDataToSend,
         })
-        imageUrl = blob.url
+
+        if (!uploadResponse.ok) {
+          throw new Error("Görsel yüklenemedi")
+        }
+
+        const { url } = await uploadResponse.json()
+        imageUrl = url
       }
 
       const productData = {
