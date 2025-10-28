@@ -5,9 +5,10 @@ import { Sidebar } from "@/components/sidebar"
 import { ProductManagement } from "@/components/product-management"
 import { CategoryManagement } from "@/components/category-management"
 import { DisplaySettings } from "@/components/display-settings"
+import { QRGenerator } from "@/components/qr-generator"
 
 export default function AdminPanel() {
-  const [activeSection, setActiveSection] = useState<"products" | "categories" | "settings">("products")
+  const [activeSection, setActiveSection] = useState<"products" | "categories" | "settings" | "qr">("products")
 
   return (
     <div className="flex h-screen bg-background">
@@ -18,6 +19,7 @@ export default function AdminPanel() {
           {activeSection === "products" && <ProductManagement />}
           {activeSection === "categories" && <CategoryManagement />}
           {activeSection === "settings" && <DisplaySettings />}
+          {activeSection === "qr" && <QRGenerator />}
         </div>
       </main>
     </div>

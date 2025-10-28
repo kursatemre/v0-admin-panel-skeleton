@@ -1,11 +1,11 @@
 "use client"
 
-import { Package, FolderTree, Settings } from "lucide-react"
+import { Package, FolderTree, Settings, QrCode } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface SidebarProps {
-  activeSection: "products" | "categories" | "settings"
-  onSectionChange: (section: "products" | "categories" | "settings") => void
+  activeSection: "products" | "categories" | "settings" | "qr"
+  onSectionChange: (section: "products" | "categories" | "settings" | "qr") => void
 }
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -24,6 +24,11 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
       id: "settings" as const,
       label: "Görünüm Ayarları",
       icon: Settings,
+    },
+    {
+      id: "qr" as const,
+      label: "QR Kod",
+      icon: QrCode,
     },
   ]
 
