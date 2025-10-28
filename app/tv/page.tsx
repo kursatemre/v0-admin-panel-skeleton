@@ -8,6 +8,9 @@ export default async function TVPage() {
 
   const backgroundColor = settings?.find((s) => s.setting_key === "background_color")?.setting_value || "#1a1a1a"
   const accentColor = settings?.find((s) => s.setting_key === "accent_color")?.setting_value || "#ef4444"
+  const pageBgColor = settings?.find((s) => s.setting_key === "page_bg_color")?.setting_value || "#1a1a1a"
+  const contentAreaBgColor =
+    settings?.find((s) => s.setting_key === "content_area_bg_color")?.setting_value || "#1a1a1a"
   const headerBgColor = settings?.find((s) => s.setting_key === "header_bg_color")?.setting_value || "#1f2937"
   const headerTextColor = settings?.find((s) => s.setting_key === "header_text_color")?.setting_value || "#ffffff"
   const categoryBgColor = settings?.find((s) => s.setting_key === "category_bg_color")?.setting_value || "#1f2937"
@@ -54,6 +57,8 @@ export default async function TVPage() {
       categories={nonEmptyCategories}
       backgroundColor={backgroundColor}
       accentColor={accentColor}
+      pageBgColor={pageBgColor}
+      contentAreaBgColor={contentAreaBgColor}
       headerBgColor={headerBgColor}
       headerTextColor={headerTextColor}
       categoryBgColor={categoryBgColor}

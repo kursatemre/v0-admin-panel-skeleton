@@ -36,6 +36,8 @@ const BORDER_RADIUS = [
 export function DisplaySettings() {
   const [backgroundColor, setBackgroundColor] = useState("#ffffff")
   const [accentColor, setAccentColor] = useState("#ef4444")
+  const [pageBgColor, setPageBgColor] = useState("#f9fafb")
+  const [contentAreaBgColor, setContentAreaBgColor] = useState("#ffffff")
   const [headerBgColor, setHeaderBgColor] = useState("#1f2937")
   const [headerTextColor, setHeaderTextColor] = useState("#ffffff")
   const [categoryBgColor, setCategoryBgColor] = useState("#f3f4f6")
@@ -79,6 +81,12 @@ export function DisplaySettings() {
           break
         case "accent_color":
           setAccentColor(setting.setting_value)
+          break
+        case "page_bg_color":
+          setPageBgColor(setting.setting_value)
+          break
+        case "content_area_bg_color":
+          setContentAreaBgColor(setting.setting_value)
           break
         case "header_bg_color":
           setHeaderBgColor(setting.setting_value)
@@ -191,6 +199,8 @@ export function DisplaySettings() {
       const settings = [
         { setting_key: "background_color", setting_value: backgroundColor },
         { setting_key: "accent_color", setting_value: accentColor },
+        { setting_key: "page_bg_color", setting_value: pageBgColor },
+        { setting_key: "content_area_bg_color", setting_value: contentAreaBgColor },
         { setting_key: "header_bg_color", setting_value: headerBgColor },
         { setting_key: "header_text_color", setting_value: headerTextColor },
         { setting_key: "category_bg_color", setting_value: categoryBgColor },
@@ -427,6 +437,18 @@ export function DisplaySettings() {
         </div>
 
         <div className="space-y-6">
+          <ColorPicker
+            label="Sayfa Arka Plan Rengi"
+            description="Tüm sayfanın ana arka plan rengi (beyaz alanlar)"
+            value={pageBgColor}
+            onChange={setPageBgColor}
+          />
+          <ColorPicker
+            label="İçerik Alanı Arka Planı"
+            description="Kategori ve ürün kartları arasındaki boşlukların rengi"
+            value={contentAreaBgColor}
+            onChange={setContentAreaBgColor}
+          />
           <ColorPicker
             label="Arka Plan Rengi"
             description="Mobil ve TV menüleri için ana arka plan rengi"

@@ -24,6 +24,8 @@ type MobileMenuProps = {
   categories: Category[]
   backgroundColor: string
   accentColor: string
+  pageBgColor: string
+  contentAreaBgColor: string
   headerBgColor: string
   headerTextColor: string
   categoryBgColor: string
@@ -98,6 +100,8 @@ export function MobileMenu({
   categories,
   backgroundColor,
   accentColor,
+  pageBgColor,
+  contentAreaBgColor,
   headerBgColor,
   headerTextColor,
   categoryBgColor,
@@ -133,33 +137,32 @@ export function MobileMenu({
   const radiusValue = getBorderRadiusValue(borderRadius)
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor, ...patternStyle }}>
+    <div className="min-h-screen" style={{ backgroundColor: pageBgColor, ...patternStyle }}>
       <div className="sticky top-0 z-10 backdrop-blur-lg border-b" style={{ backgroundColor: headerBgColor }}>
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-center gap-4 mb-2">
+          <div className="flex flex-col items-center gap-3">
             {headerLogoUrl && (
-              <div className="relative w-16 h-16 overflow-hidden flex-shrink-0" style={{ borderRadius: radiusValue }}>
+              <div className="relative w-20 h-20 overflow-hidden flex-shrink-0" style={{ borderRadius: radiusValue }}>
                 <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
               </div>
             )}
-            <h1
-              className="text-3xl font-bold text-center text-balance"
-              style={{ fontSize: `${3 * fontMultiplier}rem`, color: headerTextColor }}
-            >
-              {headerTitle}
-            </h1>
+            <div className="text-center">
+              <h1
+                className="text-3xl font-bold text-balance"
+                style={{ fontSize: `${3 * fontMultiplier}rem`, color: headerTextColor }}
+              >
+                {headerTitle}
+              </h1>
+              <p className="mt-2" style={{ fontSize: `${1 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}>
+                {headerSubtitle}
+              </p>
+            </div>
           </div>
-          <p
-            className="text-center mt-2"
-            style={{ fontSize: `${1 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}
-          >
-            {headerSubtitle}
-          </p>
         </div>
       </div>
 
       {/* Menu Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6" style={{ backgroundColor: contentAreaBgColor }}>
         {categories.map((category) => (
           <Card key={category.id} className="overflow-hidden" style={{ borderRadius: radiusValue }}>
             {/* Category Header */}

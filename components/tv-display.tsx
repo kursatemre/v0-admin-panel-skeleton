@@ -22,6 +22,8 @@ type TVDisplayProps = {
   categories: Category[]
   backgroundColor: string
   accentColor: string
+  pageBgColor: string
+  contentAreaBgColor: string
   headerBgColor: string
   headerTextColor: string
   categoryBgColor: string
@@ -96,6 +98,8 @@ export function TVDisplay({
   categories,
   backgroundColor,
   accentColor,
+  pageBgColor,
+  contentAreaBgColor,
   headerBgColor,
   headerTextColor,
   categoryBgColor,
@@ -126,7 +130,7 @@ export function TVDisplay({
 
   if (categories.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: pageBgColor }}>
         <p className="text-4xl" style={{ color: productDescColor }}>
           Henüz kategori eklenmemiş
         </p>
@@ -140,11 +144,11 @@ export function TVDisplay({
   const radiusValue = getBorderRadiusValue(borderRadius)
 
   return (
-    <div className="min-h-screen flex flex-col relative" style={{ backgroundColor, ...patternStyle }}>
+    <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: pageBgColor, ...patternStyle }}>
       <div className="py-8 px-16 border-b-4" style={{ borderColor: accentColor, backgroundColor: headerBgColor }}>
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex flex-col items-center gap-4">
           {headerLogoUrl && (
-            <div className="relative w-24 h-24 overflow-hidden" style={{ borderRadius: radiusValue }}>
+            <div className="relative w-32 h-32 overflow-hidden" style={{ borderRadius: radiusValue }}>
               <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
             </div>
           )}
