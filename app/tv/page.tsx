@@ -8,7 +8,24 @@ export default async function TVPage() {
 
   const backgroundColor = settings?.find((s) => s.setting_key === "background_color")?.setting_value || "#1a1a1a"
   const accentColor = settings?.find((s) => s.setting_key === "accent_color")?.setting_value || "#ef4444"
+  const headerBgColor = settings?.find((s) => s.setting_key === "header_bg_color")?.setting_value || "#1f2937"
+  const headerTextColor = settings?.find((s) => s.setting_key === "header_text_color")?.setting_value || "#ffffff"
+  const categoryBgColor = settings?.find((s) => s.setting_key === "category_bg_color")?.setting_value || "#1f2937"
+  const categoryTextColor = settings?.find((s) => s.setting_key === "category_text_color")?.setting_value || "#ffffff"
+  const productBgColor = settings?.find((s) => s.setting_key === "product_bg_color")?.setting_value || "#ffffff"
+  const productNameColor = settings?.find((s) => s.setting_key === "product_name_color")?.setting_value || "#111827"
+  const productDescColor = settings?.find((s) => s.setting_key === "product_desc_color")?.setting_value || "#6b7280"
+  const priceColor = settings?.find((s) => s.setting_key === "price_color")?.setting_value || "#ef4444"
+  const priceBgColor = settings?.find((s) => s.setting_key === "price_bg_color")?.setting_value || "#fef2f2"
   const backgroundPattern = settings?.find((s) => s.setting_key === "background_pattern")?.setting_value || "none"
+  const fontSize = settings?.find((s) => s.setting_key === "font_size")?.setting_value || "medium"
+  const borderRadius = settings?.find((s) => s.setting_key === "border_radius")?.setting_value || "medium"
+  const headerTitle = settings?.find((s) => s.setting_key === "header_title")?.setting_value || "Menümüz"
+  const headerSubtitle =
+    settings?.find((s) => s.setting_key === "header_subtitle")?.setting_value || "Lezzetli yemeklerimizi keşfedin"
+  const headerLogoUrl = settings?.find((s) => s.setting_key === "header_logo_url")?.setting_value || ""
+  const footerText = settings?.find((s) => s.setting_key === "footer_text")?.setting_value || "Afiyet olsun!"
+  const footerLogoUrl = settings?.find((s) => s.setting_key === "footer_logo_url")?.setting_value || ""
 
   const { data: categories } = await supabase.from("categories").select("*").order("display_order")
 
@@ -37,7 +54,23 @@ export default async function TVPage() {
       categories={nonEmptyCategories}
       backgroundColor={backgroundColor}
       accentColor={accentColor}
+      headerBgColor={headerBgColor}
+      headerTextColor={headerTextColor}
+      categoryBgColor={categoryBgColor}
+      categoryTextColor={categoryTextColor}
+      productBgColor={productBgColor}
+      productNameColor={productNameColor}
+      productDescColor={productDescColor}
+      priceColor={priceColor}
+      priceBgColor={priceBgColor}
       backgroundPattern={backgroundPattern}
+      fontSize={fontSize}
+      borderRadius={borderRadius}
+      headerTitle={headerTitle}
+      headerSubtitle={headerSubtitle}
+      headerLogoUrl={headerLogoUrl}
+      footerText={footerText}
+      footerLogoUrl={footerLogoUrl}
     />
   )
 }

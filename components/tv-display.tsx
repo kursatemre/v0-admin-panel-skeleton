@@ -22,9 +22,23 @@ type TVDisplayProps = {
   categories: Category[]
   backgroundColor: string
   accentColor: string
+  headerBgColor: string
+  headerTextColor: string
+  categoryBgColor: string
+  categoryTextColor: string
+  productBgColor: string
+  productNameColor: string
+  productDescColor: string
+  priceColor: string
+  priceBgColor: string
   backgroundPattern: string
   fontSize: string
   borderRadius: string
+  headerTitle: string
+  headerSubtitle: string
+  headerLogoUrl: string
+  footerText: string
+  footerLogoUrl: string
 }
 
 const getPatternStyle = (pattern: string, color: string) => {
@@ -82,9 +96,23 @@ export function TVDisplay({
   categories,
   backgroundColor,
   accentColor,
+  headerBgColor,
+  headerTextColor,
+  categoryBgColor,
+  categoryTextColor,
+  productBgColor,
+  productNameColor,
+  productDescColor,
+  priceColor,
+  priceBgColor,
   backgroundPattern,
   fontSize,
   borderRadius,
+  headerTitle,
+  headerSubtitle,
+  headerLogoUrl,
+  footerText,
+  footerLogoUrl,
 }: TVDisplayProps) {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0)
 
@@ -99,7 +127,9 @@ export function TVDisplay({
   if (categories.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor }}>
-        <p className="text-4xl text-muted-foreground">Henüz kategori eklenmemiş</p>
+        <p className="text-4xl" style={{ color: productDescColor }}>
+          Henüz kategori eklenmemiş
+        </p>
       </div>
     )
   }
@@ -111,8 +141,32 @@ export function TVDisplay({
 
   return (
     <div className="min-h-screen flex flex-col relative" style={{ backgroundColor, ...patternStyle }}>
+      <div className="py-8 px-16 border-b-4" style={{ borderColor: accentColor, backgroundColor: headerBgColor }}>
+        <div className="flex items-center justify-center gap-6">
+          {headerLogoUrl && (
+            <div className="relative w-24 h-24 overflow-hidden" style={{ borderRadius: radiusValue }}>
+              <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
+            </div>
+          )}
+          <div className="text-center">
+            <h1
+              className="text-6xl font-bold text-balance"
+              style={{ color: headerTextColor, fontSize: `${6 * fontMultiplier}rem` }}
+            >
+              {headerTitle}
+            </h1>
+            <p
+              className="text-2xl mt-2"
+              style={{ fontSize: `${2 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}
+            >
+              {headerSubtitle}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Category Header with Image */}
-      <div className="py-12 px-16 border-b-4" style={{ borderColor: accentColor }}>
+      <div className="py-12 px-16 border-b-4" style={{ borderColor: accentColor, backgroundColor: categoryBgColor }}>
         <div className="flex items-center justify-center gap-8">
           {currentCategory.image_url && (
             <div
@@ -130,11 +184,14 @@ export function TVDisplay({
           <div>
             <h1
               className="text-7xl font-bold text-balance"
-              style={{ color: accentColor, fontSize: `${7 * fontMultiplier}rem` }}
+              style={{ color: categoryTextColor, fontSize: `${7 * fontMultiplier}rem` }}
             >
               {currentCategory.name}
             </h1>
-            <p className="text-3xl text-muted-foreground mt-2" style={{ fontSize: `${3 * fontMultiplier}rem` }}>
+            <p
+              className="text-3xl mt-2"
+              style={{ fontSize: `${3 * fontMultiplier}rem`, color: `${categoryTextColor}cc` }}
+            >
               {currentCategory.products.length} Ürün
             </p>
           </div>
@@ -147,11 +204,15 @@ export function TVDisplay({
           {currentCategory.products.slice(0, 6).map((product) => (
             <div
               key={product.id}
-              className="bg-card overflow-hidden shadow-2xl flex flex-col border-4"
-              style={{ borderColor: `${accentColor}30`, borderRadius: radiusValue }}
+              className="overflow-hidden shadow-2xl flex flex-col border-4"
+              style={{
+                borderColor: `${accentColor}30`,
+                borderRadius: radiusValue,
+                backgroundColor: productBgColor,
+              }}
             >
               {/* Product Image */}
-              <div className="relative h-80 bg-muted">
+              <div className="relative h-80" style={{ backgroundColor: `${productNameColor}10` }}>
                 {product.image_url ? (
                   <Image
                     src={product.image_url || "/placeholder.svg"}
@@ -170,14 +231,14 @@ export function TVDisplay({
               <div className="flex-1 p-8 flex flex-col">
                 <h3
                   className="text-4xl font-bold mb-4 text-balance leading-tight"
-                  style={{ fontSize: `${4 * fontMultiplier}rem` }}
+                  style={{ fontSize: `${4 * fontMultiplier}rem`, color: productNameColor }}
                 >
                   {product.name}
                 </h3>
                 {product.description && (
                   <p
-                    className="text-xl text-muted-foreground leading-relaxed mb-6 flex-1 text-pretty line-clamp-2"
-                    style={{ fontSize: `${1.25 * fontMultiplier}rem` }}
+                    className="text-xl leading-relaxed mb-6 flex-1 text-pretty line-clamp-2"
+                    style={{ fontSize: `${1.25 * fontMultiplier}rem`, color: productDescColor }}
                   >
                     {product.description}
                   </p>
@@ -185,11 +246,11 @@ export function TVDisplay({
                 <div className="mt-auto">
                   <div
                     className="flex items-center justify-center gap-4 py-6 px-8"
-                    style={{ backgroundColor: `${accentColor}15`, borderRadius: radiusValue }}
+                    style={{ backgroundColor: priceBgColor, borderRadius: radiusValue }}
                   >
                     <span
                       className="text-5xl font-bold"
-                      style={{ color: accentColor, fontSize: `${5 * fontMultiplier}rem` }}
+                      style={{ color: priceColor, fontSize: `${5 * fontMultiplier}rem` }}
                     >
                       {product.price.toFixed(2)} ₺
                     </span>
@@ -215,9 +276,30 @@ export function TVDisplay({
             />
           ))}
         </div>
-        <p className="text-center text-2xl text-muted-foreground mt-4" style={{ fontSize: `${2 * fontMultiplier}rem` }}>
+        <p
+          className="text-center text-2xl mt-4"
+          style={{ fontSize: `${2 * fontMultiplier}rem`, color: productDescColor }}
+        >
           {currentCategoryIndex + 1} / {categories.length}
         </p>
+
+        {footerText && (
+          <div className="text-center mt-6">
+            {footerLogoUrl && (
+              <div className="flex justify-center mb-4">
+                <div className="relative w-20 h-20 overflow-hidden" style={{ borderRadius: radiusValue }}>
+                  <Image src={footerLogoUrl || "/placeholder.svg"} alt="Footer Logo" fill className="object-contain" />
+                </div>
+              </div>
+            )}
+            <p
+              className="text-2xl whitespace-pre-line"
+              style={{ fontSize: `${2 * fontMultiplier}rem`, color: productDescColor }}
+            >
+              {footerText}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

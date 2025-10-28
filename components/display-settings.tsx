@@ -1,10 +1,14 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Palette, Type, Radius, Sparkles } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Palette, Type, Radius, Sparkles, FileText } from "lucide-react"
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
 
 const PATTERNS = [
@@ -32,6 +36,24 @@ const BORDER_RADIUS = [
 export function DisplaySettings() {
   const [backgroundColor, setBackgroundColor] = useState("#ffffff")
   const [accentColor, setAccentColor] = useState("#ef4444")
+  const [headerBgColor, setHeaderBgColor] = useState("#1f2937")
+  const [headerTextColor, setHeaderTextColor] = useState("#ffffff")
+  const [categoryBgColor, setCategoryBgColor] = useState("#f3f4f6")
+  const [categoryTextColor, setCategoryTextColor] = useState("#111827")
+  const [productBgColor, setProductBgColor] = useState("#ffffff")
+  const [productNameColor, setProductNameColor] = useState("#111827")
+  const [productDescColor, setProductDescColor] = useState("#6b7280")
+  const [priceColor, setPriceColor] = useState("#ef4444")
+  const [priceBgColor, setPriceBgColor] = useState("#fef2f2")
+
+  const [headerTitle, setHeaderTitle] = useState("Menümüz")
+  const [headerSubtitle, setHeaderSubtitle] = useState("Lezzetli yemeklerimizi keşfedin")
+  const [headerLogoUrl, setHeaderLogoUrl] = useState("")
+  const [footerText, setFooterText] = useState("Afiyet olsun!")
+  const [footerLogoUrl, setFooterLogoUrl] = useState("")
+  const [uploadingHeaderLogo, setUploadingHeaderLogo] = useState(false)
+  const [uploadingFooterLogo, setUploadingFooterLogo] = useState(false)
+
   const [backgroundPattern, setBackgroundPattern] = useState("none")
   const [fontSize, setFontSize] = useState("medium")
   const [borderRadius, setBorderRadius] = useState("medium")
@@ -51,18 +73,116 @@ export function DisplaySettings() {
     }
 
     data?.forEach((setting) => {
-      if (setting.setting_key === "background_color") {
-        setBackgroundColor(setting.setting_value)
-      } else if (setting.setting_key === "accent_color") {
-        setAccentColor(setting.setting_value)
-      } else if (setting.setting_key === "background_pattern") {
-        setBackgroundPattern(setting.setting_value)
-      } else if (setting.setting_key === "font_size") {
-        setFontSize(setting.setting_value)
-      } else if (setting.setting_key === "border_radius") {
-        setBorderRadius(setting.setting_value)
+      switch (setting.setting_key) {
+        case "background_color":
+          setBackgroundColor(setting.setting_value)
+          break
+        case "accent_color":
+          setAccentColor(setting.setting_value)
+          break
+        case "header_bg_color":
+          setHeaderBgColor(setting.setting_value)
+          break
+        case "header_text_color":
+          setHeaderTextColor(setting.setting_value)
+          break
+        case "category_bg_color":
+          setCategoryBgColor(setting.setting_value)
+          break
+        case "category_text_color":
+          setCategoryTextColor(setting.setting_value)
+          break
+        case "product_bg_color":
+          setProductBgColor(setting.setting_value)
+          break
+        case "product_name_color":
+          setProductNameColor(setting.setting_value)
+          break
+        case "product_desc_color":
+          setProductDescColor(setting.setting_value)
+          break
+        case "price_color":
+          setPriceColor(setting.setting_value)
+          break
+        case "price_bg_color":
+          setPriceBgColor(setting.setting_value)
+          break
+        case "background_pattern":
+          setBackgroundPattern(setting.setting_value)
+          break
+        case "font_size":
+          setFontSize(setting.setting_value)
+          break
+        case "border_radius":
+          setBorderRadius(setting.setting_value)
+          break
+        case "header_title":
+          setHeaderTitle(setting.setting_value)
+          break
+        case "header_subtitle":
+          setHeaderSubtitle(setting.setting_value)
+          break
+        case "header_logo_url":
+          setHeaderLogoUrl(setting.setting_value)
+          break
+        case "footer_text":
+          setFooterText(setting.setting_value)
+          break
+        case "footer_logo_url":
+          setFooterLogoUrl(setting.setting_value)
+          break
       }
     })
+  }
+
+  const handleHeaderLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingHeaderLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error("Upload failed")
+
+      const { url } = await response.json()
+      setHeaderLogoUrl(url)
+    } catch (error) {
+      alert("Logo yüklenirken bir hata oluştu")
+    } finally {
+      setUploadingHeaderLogo(false)
+    }
+  }
+
+  const handleFooterLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingFooterLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error("Upload failed")
+
+      const { url } = await response.json()
+      setFooterLogoUrl(url)
+    } catch (error) {
+      alert("Logo yüklenirken bir hata oluştu")
+    } finally {
+      setUploadingFooterLogo(false)
+    }
   }
 
   const handleSave = async () => {
@@ -71,9 +191,23 @@ export function DisplaySettings() {
       const settings = [
         { setting_key: "background_color", setting_value: backgroundColor },
         { setting_key: "accent_color", setting_value: accentColor },
+        { setting_key: "header_bg_color", setting_value: headerBgColor },
+        { setting_key: "header_text_color", setting_value: headerTextColor },
+        { setting_key: "category_bg_color", setting_value: categoryBgColor },
+        { setting_key: "category_text_color", setting_value: categoryTextColor },
+        { setting_key: "product_bg_color", setting_value: productBgColor },
+        { setting_key: "product_name_color", setting_value: productNameColor },
+        { setting_key: "product_desc_color", setting_value: productDescColor },
+        { setting_key: "price_color", setting_value: priceColor },
+        { setting_key: "price_bg_color", setting_value: priceBgColor },
         { setting_key: "background_pattern", setting_value: backgroundPattern },
         { setting_key: "font_size", setting_value: fontSize },
         { setting_key: "border_radius", setting_value: borderRadius },
+        { setting_key: "header_title", setting_value: headerTitle },
+        { setting_key: "header_subtitle", setting_value: headerSubtitle },
+        { setting_key: "header_logo_url", setting_value: headerLogoUrl },
+        { setting_key: "footer_text", setting_value: footerText },
+        { setting_key: "footer_logo_url", setting_value: footerLogoUrl },
       ]
 
       for (const setting of settings) {
@@ -116,6 +250,32 @@ export function DisplaySettings() {
     }
   }
 
+  const ColorPicker = ({
+    label,
+    description,
+    value,
+    onChange,
+  }: { label: string; description: string; value: string; onChange: (value: string) => void }) => (
+    <div className="space-y-3">
+      <Label className="text-base font-medium">{label}</Label>
+      <p className="text-sm text-muted-foreground">{description}</p>
+      <div className="flex items-center gap-4">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-12 w-20 rounded-lg border-2 border-border cursor-pointer"
+        />
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-mono text-muted-foreground">{value}</span>
+            <div className="w-full h-10 rounded-lg border-2 border-border" style={{ backgroundColor: value }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="space-y-6">
       <div>
@@ -126,63 +286,246 @@ export function DisplaySettings() {
       <Card className="p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Palette className="w-6 h-6 text-primary" />
+            <FileText className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-1">Renk Ayarları</h3>
-            <p className="text-sm text-muted-foreground">Menü renk paletini özelleştirin</p>
+            <h3 className="font-semibold text-lg mb-1">Header Özelleştirme</h3>
+            <p className="text-sm text-muted-foreground">Üst başlık alanının içeriğini düzenleyin</p>
           </div>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-3">
-            <Label htmlFor="bg-color" className="text-base font-medium">
-              Arka Plan Rengi
-            </Label>
-            <p className="text-sm text-muted-foreground">Mobil ve TV menüleri için arka plan rengini seçin</p>
-            <div className="flex items-center gap-4">
-              <input
-                id="bg-color"
-                type="color"
-                value={backgroundColor}
-                onChange={(e) => setBackgroundColor(e.target.value)}
-                className="h-12 w-20 rounded-lg border-2 border-border cursor-pointer"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-muted-foreground">{backgroundColor}</span>
-                  <div className="w-full h-10 rounded-lg border-2 border-border" style={{ backgroundColor }} />
-                </div>
-              </div>
-            </div>
+            <Label className="text-base font-medium">Header Başlık</Label>
+            <Input
+              value={headerTitle}
+              onChange={(e) => setHeaderTitle(e.target.value)}
+              placeholder="Menümüz"
+              className="text-lg"
+            />
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="accent-color" className="text-base font-medium">
-              Vurgu Rengi
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              Fiyatlar ve önemli butonlar için kullanılacak vurgu rengini seçin
-            </p>
+            <Label className="text-base font-medium">Header Alt Başlık</Label>
+            <Input
+              value={headerSubtitle}
+              onChange={(e) => setHeaderSubtitle(e.target.value)}
+              placeholder="Lezzetli yemeklerimizi keşfedin"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Header Logo</Label>
+            <p className="text-sm text-muted-foreground">Başlıkta görünecek logo (opsiyonel)</p>
             <div className="flex items-center gap-4">
-              <input
-                id="accent-color"
-                type="color"
-                value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
-                className="h-12 w-20 rounded-lg border-2 border-border cursor-pointer"
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleHeaderLogoUpload}
+                disabled={uploadingHeaderLogo}
+                className="flex-1"
               />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-muted-foreground">{accentColor}</span>
-                  <div
-                    className="w-full h-10 rounded-lg border-2 border-border"
-                    style={{ backgroundColor: accentColor }}
+              {headerLogoUrl && (
+                <div className="relative w-16 h-16 rounded-lg border-2 border-border overflow-hidden flex-shrink-0">
+                  <img
+                    src={headerLogoUrl || "/placeholder.svg"}
+                    alt="Header Logo"
+                    className="w-full h-full object-cover"
                   />
                 </div>
-              </div>
+              )}
             </div>
+            {uploadingHeaderLogo && <p className="text-sm text-muted-foreground">Yükleniyor...</p>}
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Footer Özelleştirme</h3>
+            <p className="text-sm text-muted-foreground">Alt bilgi alanının içeriğini düzenleyin</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Footer Yazısı</Label>
+            <Textarea
+              value={footerText}
+              onChange={(e) => setFooterText(e.target.value)}
+              placeholder="Afiyet olsun!"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Footer Logo</Label>
+            <p className="text-sm text-muted-foreground">Alt bilgide görünecek logo (opsiyonel)</p>
+            <div className="flex items-center gap-4">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleFooterLogoUpload}
+                disabled={uploadingFooterLogo}
+                className="flex-1"
+              />
+              {footerLogoUrl && (
+                <div className="relative w-16 h-16 rounded-lg border-2 border-border overflow-hidden flex-shrink-0">
+                  <img
+                    src={footerLogoUrl || "/placeholder.svg"}
+                    alt="Footer Logo"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            {uploadingFooterLogo && <p className="text-sm text-muted-foreground">Yükleniyor...</p>}
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Palette className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Genel Renk Ayarları</h3>
+            <p className="text-sm text-muted-foreground">Temel renk paletini özelleştirin</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <ColorPicker
+            label="Arka Plan Rengi"
+            description="Mobil ve TV menüleri için ana arka plan rengi"
+            value={backgroundColor}
+            onChange={setBackgroundColor}
+          />
+          <ColorPicker
+            label="Vurgu Rengi"
+            description="Butonlar ve vurgular için kullanılacak ana renk"
+            value={accentColor}
+            onChange={setAccentColor}
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Palette className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Header Renkleri</h3>
+            <p className="text-sm text-muted-foreground">Üst başlık alanının renklerini ayarlayın</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <ColorPicker
+            label="Header Arka Plan"
+            description="Üst başlık alanının arka plan rengi"
+            value={headerBgColor}
+            onChange={setHeaderBgColor}
+          />
+          <ColorPicker
+            label="Header Yazı Rengi"
+            description="Üst başlıktaki yazı ve simge rengi"
+            value={headerTextColor}
+            onChange={setHeaderTextColor}
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Palette className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Kategori Renkleri</h3>
+            <p className="text-sm text-muted-foreground">Kategori başlıklarının renklerini ayarlayın</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <ColorPicker
+            label="Kategori Arka Plan"
+            description="Kategori başlıklarının arka plan rengi"
+            value={categoryBgColor}
+            onChange={setCategoryBgColor}
+          />
+          <ColorPicker
+            label="Kategori Yazı Rengi"
+            description="Kategori isimlerinin yazı rengi"
+            value={categoryTextColor}
+            onChange={setCategoryTextColor}
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Palette className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Ürün Renkleri</h3>
+            <p className="text-sm text-muted-foreground">Ürün kartlarının renklerini ayarlayın</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <ColorPicker
+            label="Ürün Arka Plan"
+            description="Ürün kartlarının arka plan rengi"
+            value={productBgColor}
+            onChange={setProductBgColor}
+          />
+          <ColorPicker
+            label="Ürün Adı Rengi"
+            description="Ürün isimlerinin yazı rengi"
+            value={productNameColor}
+            onChange={setProductNameColor}
+          />
+          <ColorPicker
+            label="Açıklama Rengi"
+            description="Ürün açıklamalarının yazı rengi"
+            value={productDescColor}
+            onChange={setProductDescColor}
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Palette className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Fiyat Renkleri</h3>
+            <p className="text-sm text-muted-foreground">Fiyat etiketlerinin renklerini ayarlayın</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <ColorPicker
+            label="Fiyat Yazı Rengi"
+            description="Fiyat rakamlarının rengi"
+            value={priceColor}
+            onChange={setPriceColor}
+          />
+          <ColorPicker
+            label="Fiyat Arka Plan"
+            description="Fiyat etiketinin arka plan rengi"
+            value={priceBgColor}
+            onChange={setPriceBgColor}
+          />
         </div>
       </Card>
 
