@@ -7,12 +7,15 @@ import { ProductManagement } from "@/components/product-management"
 import { CategoryManagement } from "@/components/category-management"
 import { DisplaySettings } from "@/components/display-settings"
 import { QRGenerator } from "@/components/qr-generator"
+import { OrderManagement } from "@/components/order-management"
 import { Button } from "@/components/ui/button"
-import { LogOut } from "lucide-react"
+import { LogOut, Monitor, Menu } from "lucide-react"
 
 export default function AdminPanel() {
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState<"products" | "categories" | "settings" | "qr">("products")
+  const [activeSection, setActiveSection] = useState<"products" | "categories" | "settings" | "qr" | "orders">(
+    "products",
+  )
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -64,7 +67,17 @@ export default function AdminPanel() {
 
       <main className="flex-1 overflow-y-auto">
         <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container mx-auto px-6 py-3 flex justify-end">
+          <div className="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => window.open("/tv", "_blank")}>
+                <Monitor className="h-4 w-4 mr-2" />
+                TV Ekranı
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => window.open("/menu", "_blank")}>
+                <Menu className="h-4 w-4 mr-2" />
+                Menü Sayfası
+              </Button>
+            </div>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Çıkış Yap
@@ -75,6 +88,7 @@ export default function AdminPanel() {
         <div className="container mx-auto p-6 lg:p-8">
           {activeSection === "products" && <ProductManagement />}
           {activeSection === "categories" && <CategoryManagement />}
+          {activeSection === "orders" && <OrderManagement />}
           {activeSection === "settings" && <DisplaySettings />}
           {activeSection === "qr" && <QRGenerator />}
         </div>
