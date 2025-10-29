@@ -4,18 +4,17 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Phone, Mail, Package, Clock } from "lucide-react"
+import { Loader2, Phone, Package, Clock, User } from "lucide-react"
 import { getSupabaseBrowserClient, initSupabaseClient } from "@/lib/supabase-client"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 interface Order {
   id: string
   product_id: string
-  customer_name: string
-  customer_phone: string
-  customer_email?: string
+  first_name: string // Changed from customer_name to first_name and last_name
+  last_name: string
+  phone: string // Changed from customer_phone to phone
   quantity: number
-  notes?: string
   status: "pending" | "confirmed" | "ready" | "completed" | "cancelled"
   created_at: string
   products?: {
@@ -142,19 +141,16 @@ export function OrderManagement() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
+                      <User className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Müşteri:</span>
-                      <span>{order.customer_name}</span>
+                      <span>
+                        {order.first_name} {order.last_name}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{order.customer_phone}</span>
+                      <span>{order.phone}</span>
                     </div>
-                    {order.customer_email && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <span>{order.customer_email}</span>
-                      </div>
-                    )}
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
@@ -169,13 +165,6 @@ export function OrderManagement() {
                     </div>
                   </div>
                 </div>
-
-                {order.notes && (
-                  <div className="rounded-lg bg-muted p-3">
-                    <p className="text-sm font-medium mb-1">Not:</p>
-                    <p className="text-sm text-muted-foreground">{order.notes}</p>
-                  </div>
-                )}
 
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Durum:</span>

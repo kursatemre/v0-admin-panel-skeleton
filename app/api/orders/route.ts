@@ -4,9 +4,9 @@ import { getSupabaseServerClient } from "@/lib/supabase-server"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { product_id, customer_name, customer_phone, customer_email, quantity, notes } = body
+    const { product_id, first_name, last_name, phone, quantity } = body
 
-    if (!product_id || !customer_name || !customer_phone || !quantity) {
+    if (!product_id || !first_name || !last_name || !phone || !quantity) {
       return NextResponse.json({ error: "Gerekli alanlar eksik" }, { status: 400 })
     }
 
@@ -16,11 +16,10 @@ export async function POST(request: NextRequest) {
       .from("orders")
       .insert({
         product_id,
-        customer_name,
-        customer_phone,
-        customer_email: customer_email || null,
+        first_name,
+        last_name,
+        phone,
         quantity,
-        notes: notes || null,
         status: "pending",
       })
       .select()

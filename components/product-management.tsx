@@ -110,7 +110,14 @@ export function ProductManagement() {
       })
     } else {
       setEditingProduct(null)
-      setFormData({ name: "", description: "", price: "", category_id: "", image: null, pre_order_enabled: false })
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        category_id: "",
+        image: null,
+        pre_order_enabled: false,
+      })
     }
     setIsModalOpen(true)
   }
@@ -118,7 +125,14 @@ export function ProductManagement() {
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setEditingProduct(null)
-    setFormData({ name: "", description: "", price: "", category_id: "", image: null, pre_order_enabled: false })
+    setFormData({
+      name: "",
+      description: "",
+      price: "",
+      category_id: "",
+      image: null,
+      pre_order_enabled: false,
+    })
   }
 
   const handleSave = async () => {
@@ -156,22 +170,26 @@ export function ProductManagement() {
       }
 
       if (editingProduct) {
-        // Update existing product
         const { error } = await supabase.from("products").update(productData).eq("id", editingProduct.id)
 
-        if (error) throw error
+        if (error) {
+          console.error("[v0] Error updating product:", error)
+          throw error
+        }
       } else {
-        // Insert new product
         const { error } = await supabase.from("products").insert(productData)
 
-        if (error) throw error
+        if (error) {
+          console.error("[v0] Error inserting product:", error)
+          throw error
+        }
       }
 
       await loadProducts()
       handleCloseModal()
-    } catch (error) {
+    } catch (error: any) {
       console.error("[v0] Error saving product:", error)
-      alert("Ürün kaydedilirken bir hata oluştu")
+      alert(`Ürün kaydedilirken bir hata oluştu: ${error.message || JSON.stringify(error)}`)
     } finally {
       setIsLoading(false)
     }

@@ -139,11 +139,10 @@ export function MobileMenu({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(categories.map((c) => c.id)))
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [orderForm, setOrderForm] = useState({
-    customer_name: "",
-    customer_phone: "",
-    customer_email: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
     quantity: 1,
-    notes: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -176,11 +175,10 @@ export function MobileMenu({
       alert("Siparişiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.")
       setSelectedProduct(null)
       setOrderForm({
-        customer_name: "",
-        customer_phone: "",
-        customer_email: "",
+        first_name: "",
+        last_name: "",
+        phone: "",
         quantity: 1,
-        notes: "",
       })
     } catch (error) {
       console.error("Error submitting order:", error)
@@ -391,12 +389,24 @@ export function MobileMenu({
 
             <div className="p-6 space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Adınız Soyadınız *</label>
+                <label className="text-sm font-medium">Adınız *</label>
                 <input
                   type="text"
-                  value={orderForm.customer_name}
-                  onChange={(e) => setOrderForm({ ...orderForm, customer_name: e.target.value })}
+                  value={orderForm.first_name}
+                  onChange={(e) => setOrderForm({ ...orderForm, first_name: e.target.value })}
                   placeholder="Adınızı girin"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Soyadınız *</label>
+                <input
+                  type="text"
+                  value={orderForm.last_name}
+                  onChange={(e) => setOrderForm({ ...orderForm, last_name: e.target.value })}
+                  placeholder="Soyadınızı girin"
                   className="w-full px-4 py-2 border rounded-lg"
                   required
                 />
@@ -406,22 +416,11 @@ export function MobileMenu({
                 <label className="text-sm font-medium">Telefon Numaranız *</label>
                 <input
                   type="tel"
-                  value={orderForm.customer_phone}
-                  onChange={(e) => setOrderForm({ ...orderForm, customer_phone: e.target.value })}
+                  value={orderForm.phone}
+                  onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })}
                   placeholder="05XX XXX XX XX"
                   className="w-full px-4 py-2 border rounded-lg"
                   required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">E-posta (Opsiyonel)</label>
-                <input
-                  type="email"
-                  value={orderForm.customer_email}
-                  onChange={(e) => setOrderForm({ ...orderForm, customer_email: e.target.value })}
-                  placeholder="ornek@email.com"
-                  className="w-full px-4 py-2 border rounded-lg"
                 />
               </div>
 
@@ -434,17 +433,6 @@ export function MobileMenu({
                   onChange={(e) => setOrderForm({ ...orderForm, quantity: Number.parseInt(e.target.value) || 1 })}
                   className="w-full px-4 py-2 border rounded-lg"
                   required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Notunuz (Opsiyonel)</label>
-                <textarea
-                  value={orderForm.notes}
-                  onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
-                  placeholder="Varsa özel isteklerinizi yazın"
-                  rows={3}
-                  className="w-full px-4 py-2 border rounded-lg resize-none"
                 />
               </div>
 
@@ -465,7 +453,7 @@ export function MobileMenu({
               </button>
               <button
                 onClick={handlePreOrder}
-                disabled={isSubmitting || !orderForm.customer_name || !orderForm.customer_phone}
+                disabled={isSubmitting || !orderForm.first_name || !orderForm.last_name || !orderForm.phone}
                 className="px-4 py-2 rounded-lg font-medium text-white"
                 style={{ backgroundColor: accentColor }}
               >
