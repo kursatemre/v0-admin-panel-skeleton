@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { initSupabaseClient } from "@/lib/supabase-client" // Import the initSupabaseClient function
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
@@ -9,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Palette, Type, Radius, Sparkles, FileText } from "lucide-react"
-import { getSupabaseBrowserClient } from "@/lib/supabase-client"
+import type { getSupabaseBrowserClient } from "@/lib/supabase-client"
 
 const PATTERNS = [
   { id: "none", name: "Desensiz" },
@@ -31,6 +32,13 @@ const BORDER_RADIUS = [
   { id: "small", name: "Az", value: "0.375" },
   { id: "medium", name: "Orta", value: "0.5" },
   { id: "large", name: "Çok", value: "1" },
+]
+
+const LOGO_SIZES = [
+  { id: "small", name: "Küçük", value: "64" },
+  { id: "medium", name: "Orta", value: "96" },
+  { id: "large", name: "Büyük", value: "128" },
+  { id: "xlarge", name: "Çok Büyük", value: "160" },
 ]
 
 export function DisplaySettings() {
@@ -59,15 +67,33 @@ export function DisplaySettings() {
   const [backgroundPattern, setBackgroundPattern] = useState("none")
   const [fontSize, setFontSize] = useState("medium")
   const [borderRadius, setBorderRadius] = useState("medium")
+  const [logoSize, setLogoSize] = useState("medium")
   const [isLoading, setIsLoading] = useState(false)
 
-  const supabase = getSupabaseBrowserClient()
+  const [supabase, setSupabase] = useState<ReturnType<typeof getSupabaseBrowserClient> | null>(null)
+  const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
-    loadSettings()
+    initSupabaseClient() // Declare the initSupabaseClient function
+      .then((client) => {
+        setSupabase(client)
+        setIsInitializing(false)
+      })
+      .catch((error) => {
+        console.error("Failed to initialize Supabase:", error)
+        setIsInitializing(false)
+      })
   }, [])
 
+  useEffect(() => {
+    if (supabase) {
+      loadSettings()
+    }
+  }, [supabase])
+
   const loadSettings = async () => {
+    if (!supabase) return
+
     const { data, error } = await supabase.from("display_settings").select("*")
 
     if (error) {
@@ -123,6 +149,9 @@ export function DisplaySettings() {
           break
         case "border_radius":
           setBorderRadius(setting.setting_value)
+          break
+        case "logo_size":
+          setLogoSize(setting.setting_value)
           break
         case "header_title":
           setHeaderTitle(setting.setting_value)
@@ -194,6 +223,8 @@ export function DisplaySettings() {
   }
 
   const handleSave = async () => {
+    if (!supabase) return
+
     setIsLoading(true)
     try {
       const settings = [
@@ -213,6 +244,7 @@ export function DisplaySettings() {
         { setting_key: "background_pattern", setting_value: backgroundPattern },
         { setting_key: "font_size", setting_value: fontSize },
         { setting_key: "border_radius", setting_value: borderRadius },
+        { setting_key: "logo_size", setting_value: logoSize },
         { setting_key: "header_title", setting_value: headerTitle },
         { setting_key: "header_subtitle", setting_value: headerSubtitle },
         { setting_key: "header_logo_url", setting_value: headerLogoUrl },
@@ -308,6 +340,17 @@ export function DisplaySettings() {
               <div className="flex-1 h-10 rounded-lg border-2 border-border" style={{ backgroundColor: value }} />
             </div>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Yükleniyor...</p>
         </div>
       </div>
     )
@@ -669,6 +712,39 @@ export function DisplaySettings() {
                 style={{ borderRadius: `${Number.parseFloat(radius.value)}rem` }}
               />
               <p className="text-xs text-muted-foreground">{radius.name}</p>
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1">Logo Boyutu</h3>
+            <p className="text-sm text-muted-foreground">Header ve footer logolarının boyutunu ayarlayın</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-3">
+          {LOGO_SIZES.map((size) => (
+            <button
+              key={size.id}
+              onClick={() => setLogoSize(size.id)}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                logoSize === size.id ? "border-primary bg-primary/5 shadow-md" : "border-border hover:border-primary/50"
+              }`}
+            >
+              <div
+                className="bg-primary/20 mx-auto mb-2 rounded"
+                style={{
+                  width: `${Number.parseInt(size.value) / 4}px`,
+                  height: `${Number.parseInt(size.value) / 4}px`,
+                }}
+              />
+              <p className="text-xs text-muted-foreground">{size.name}</p>
             </button>
           ))}
         </div>

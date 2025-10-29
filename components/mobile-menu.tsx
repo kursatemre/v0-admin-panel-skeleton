@@ -38,6 +38,7 @@ type MobileMenuProps = {
   backgroundPattern: string
   fontSize: string
   borderRadius: string
+  logoSize: string
   headerTitle: string
   headerSubtitle: string
   headerLogoUrl: string
@@ -96,6 +97,19 @@ const getBorderRadiusValue = (radius: string) => {
   }
 }
 
+const getLogoSizeValue = (size: string) => {
+  switch (size) {
+    case "small":
+      return "64px"
+    case "large":
+      return "128px"
+    case "xlarge":
+      return "160px"
+    default:
+      return "96px"
+  }
+}
+
 export function MobileMenu({
   categories,
   backgroundColor,
@@ -114,6 +128,7 @@ export function MobileMenu({
   backgroundPattern,
   fontSize,
   borderRadius,
+  logoSize,
   headerTitle,
   headerSubtitle,
   headerLogoUrl,
@@ -135,28 +150,30 @@ export function MobileMenu({
   const patternStyle = getPatternStyle(backgroundPattern, accentColor)
   const fontMultiplier = getFontSizeMultiplier(fontSize)
   const radiusValue = getBorderRadiusValue(borderRadius)
+  const logoSizeValue = getLogoSizeValue(logoSize)
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: pageBgColor, ...patternStyle }}>
       <div className="sticky top-0 z-10 backdrop-blur-lg border-b" style={{ backgroundColor: headerBgColor }}>
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex flex-col items-center gap-3">
-            {headerLogoUrl && (
-              <div className="relative w-20 h-20 overflow-hidden flex-shrink-0" style={{ borderRadius: radiusValue }}>
-                <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
-              </div>
-            )}
-            <div className="text-center">
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
               <h1
                 className="text-3xl font-bold text-balance"
                 style={{ fontSize: `${3 * fontMultiplier}rem`, color: headerTextColor }}
               >
                 {headerTitle}
               </h1>
-              <p className="mt-2" style={{ fontSize: `${1 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}>
-                {headerSubtitle}
-              </p>
+              <p style={{ fontSize: `${1 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}>{headerSubtitle}</p>
             </div>
+            {headerLogoUrl && (
+              <div
+                className="relative overflow-hidden flex-shrink-0"
+                style={{ width: logoSizeValue, height: logoSizeValue, borderRadius: radiusValue }}
+              >
+                <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -293,7 +310,10 @@ export function MobileMenu({
       >
         {footerLogoUrl && (
           <div className="flex justify-center mb-4">
-            <div className="relative w-20 h-20 overflow-hidden" style={{ borderRadius: radiusValue }}>
+            <div
+              className="relative overflow-hidden"
+              style={{ width: logoSizeValue, height: logoSizeValue, borderRadius: radiusValue }}
+            >
               <Image src={footerLogoUrl || "/placeholder.svg"} alt="Footer Logo" fill className="object-contain" />
             </div>
           </div>

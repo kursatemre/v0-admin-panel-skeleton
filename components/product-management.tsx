@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Search, Pencil, Trash2, X, Upload } from "lucide-react"
-import { getSupabaseBrowserClient } from "@/lib/supabase-client"
+import { initSupabaseClient } from "@/lib/supabase-client" // Declare the variable before using it
 
 type Product = {
   id: string
@@ -36,15 +36,28 @@ export function ProductManagement() {
     category_id: "",
     image: null as File | null,
   })
-
-  const supabase = getSupabaseBrowserClient()
+  const [supabase, setSupabase] = useState<any>(null)
 
   useEffect(() => {
-    loadProducts()
-    loadCategories()
+    initSupabaseClient()
+      .then((client) => {
+        setSupabase(client)
+      })
+      .catch((error) => {
+        console.error("[v0] Failed to initialize Supabase:", error)
+      })
   }, [])
 
+  useEffect(() => {
+    if (supabase) {
+      loadProducts()
+      loadCategories()
+    }
+  }, [supabase])
+
   const loadProducts = async () => {
+    if (!supabase) return
+
     const { data, error } = await supabase
       .from("products")
       .select(`
@@ -70,6 +83,8 @@ export function ProductManagement() {
   }
 
   const loadCategories = async () => {
+    if (!supabase) return
+
     const { data, error } = await supabase.from("categories").select("*").order("display_order")
 
     if (error) {
@@ -104,6 +119,8 @@ export function ProductManagement() {
   }
 
   const handleSave = async () => {
+    if (!supabase) return
+
     setIsLoading(true)
     try {
       let imageUrl = editingProduct?.image_url
@@ -157,6 +174,8 @@ export function ProductManagement() {
   }
 
   const handleDelete = async (id: string) => {
+    if (!supabase) return
+
     if (!confirm("Bu ürünü silmek istediğinizden emin misiniz?")) return
 
     const { error } = await supabase.from("products").update({ is_active: false }).eq("id", id)
@@ -171,6 +190,17 @@ export function ProductManagement() {
   }
 
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+  if (!supabase) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

@@ -36,6 +36,7 @@ type TVDisplayProps = {
   backgroundPattern: string
   fontSize: string
   borderRadius: string
+  logoSize: string
   headerTitle: string
   headerSubtitle: string
   headerLogoUrl: string
@@ -94,6 +95,19 @@ const getBorderRadiusValue = (radius: string) => {
   }
 }
 
+const getLogoSizeValue = (size: string) => {
+  switch (size) {
+    case "small":
+      return "96px"
+    case "large":
+      return "192px"
+    case "xlarge":
+      return "240px"
+    default:
+      return "144px"
+  }
+}
+
 export function TVDisplay({
   categories,
   backgroundColor,
@@ -112,6 +126,7 @@ export function TVDisplay({
   backgroundPattern,
   fontSize,
   borderRadius,
+  logoSize,
   headerTitle,
   headerSubtitle,
   headerLogoUrl,
@@ -142,34 +157,34 @@ export function TVDisplay({
   const patternStyle = getPatternStyle(backgroundPattern, accentColor)
   const fontMultiplier = getFontSizeMultiplier(fontSize)
   const radiusValue = getBorderRadiusValue(borderRadius)
+  const logoSizeValue = getLogoSizeValue(logoSize)
 
   return (
     <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: pageBgColor, ...patternStyle }}>
       <div className="py-8 px-16 border-b-4" style={{ borderColor: accentColor, backgroundColor: headerBgColor }}>
-        <div className="flex flex-col items-center gap-4">
-          {headerLogoUrl && (
-            <div className="relative w-32 h-32 overflow-hidden" style={{ borderRadius: radiusValue }}>
-              <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
-            </div>
-          )}
-          <div className="text-center">
+        <div className="flex items-center justify-between gap-8">
+          <div className="flex-1">
             <h1
               className="text-6xl font-bold text-balance"
               style={{ color: headerTextColor, fontSize: `${6 * fontMultiplier}rem` }}
             >
               {headerTitle}
             </h1>
-            <p
-              className="text-2xl mt-2"
-              style={{ fontSize: `${2 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}
-            >
+            <p className="text-2xl" style={{ fontSize: `${2 * fontMultiplier}rem`, color: `${headerTextColor}cc` }}>
               {headerSubtitle}
             </p>
           </div>
+          {headerLogoUrl && (
+            <div
+              className="relative overflow-hidden flex-shrink-0"
+              style={{ width: logoSizeValue, height: logoSizeValue, borderRadius: radiusValue }}
+            >
+              <Image src={headerLogoUrl || "/placeholder.svg"} alt="Logo" fill className="object-contain" />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Category Header with Image */}
       <div className="py-12 px-16 border-b-4" style={{ borderColor: accentColor, backgroundColor: categoryBgColor }}>
         <div className="flex items-center justify-center gap-8">
           {currentCategory.image_url && (
@@ -202,7 +217,6 @@ export function TVDisplay({
         </div>
       </div>
 
-      {/* Products Grid - Full Screen */}
       <div className="flex-1 p-16">
         <div className="grid grid-cols-3 gap-10 h-full">
           {currentCategory.products.slice(0, 6).map((product) => (
@@ -215,7 +229,6 @@ export function TVDisplay({
                 backgroundColor: productBgColor,
               }}
             >
-              {/* Product Image */}
               <div className="relative h-80" style={{ backgroundColor: `${productNameColor}10` }}>
                 {product.image_url ? (
                   <Image
@@ -231,7 +244,6 @@ export function TVDisplay({
                 )}
               </div>
 
-              {/* Product Info */}
               <div className="flex-1 p-8 flex flex-col">
                 <h3
                   className="text-4xl font-bold mb-4 text-balance leading-tight"
@@ -266,7 +278,6 @@ export function TVDisplay({
         </div>
       </div>
 
-      {/* Category Navigation Dots */}
       <div className="py-8 px-16">
         <div className="flex items-center justify-center gap-4">
           {categories.map((_, index) => (
@@ -291,7 +302,10 @@ export function TVDisplay({
           <div className="text-center mt-6">
             {footerLogoUrl && (
               <div className="flex justify-center mb-4">
-                <div className="relative w-20 h-20 overflow-hidden" style={{ borderRadius: radiusValue }}>
+                <div
+                  className="relative overflow-hidden"
+                  style={{ width: logoSizeValue, height: logoSizeValue, borderRadius: radiusValue }}
+                >
                   <Image src={footerLogoUrl || "/placeholder.svg"} alt="Footer Logo" fill className="object-contain" />
                 </div>
               </div>

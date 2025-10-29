@@ -23,6 +23,7 @@ export default async function MenuPage() {
   const backgroundPattern = settings?.find((s) => s.setting_key === "background_pattern")?.setting_value || "none"
   const fontSize = settings?.find((s) => s.setting_key === "font_size")?.setting_value || "medium"
   const borderRadius = settings?.find((s) => s.setting_key === "border_radius")?.setting_value || "medium"
+  const logoSize = settings?.find((s) => s.setting_key === "logo_size")?.setting_value || "medium"
   const headerTitle = settings?.find((s) => s.setting_key === "header_title")?.setting_value || "Menümüz"
   const headerSubtitle =
     settings?.find((s) => s.setting_key === "header_subtitle")?.setting_value || "Lezzetli yemeklerimizi keşfedin"
@@ -68,6 +69,7 @@ export default async function MenuPage() {
       backgroundPattern={backgroundPattern}
       fontSize={fontSize}
       borderRadius={borderRadius}
+      logoSize={logoSize}
       headerTitle={headerTitle}
       headerSubtitle={headerSubtitle}
       headerLogoUrl={headerLogoUrl}

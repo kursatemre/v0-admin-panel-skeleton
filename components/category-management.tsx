@@ -1,12 +1,13 @@
 "use client"
 
 import type React from "react"
+import { initSupabaseClient } from "@/lib/supabase-client" // Import initSupabaseClient
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, FolderOpen, Pencil, Trash2, X, Upload } from "lucide-react"
-import { getSupabaseBrowserClient } from "@/lib/supabase-client"
+import type { getSupabaseBrowserClient } from "@/lib/supabase-client"
 import Image from "next/image"
 
 type Category = {
@@ -26,13 +27,30 @@ export function CategoryManagement() {
   const [imagePreview, setImagePreview] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const supabase = getSupabaseBrowserClient()
+  const [supabase, setSupabase] = useState<ReturnType<typeof getSupabaseBrowserClient> | null>(null)
+  const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
-    loadCategories()
+    initSupabaseClient()
+      .then((client) => {
+        setSupabase(client)
+        setIsInitializing(false)
+      })
+      .catch((error) => {
+        console.error("Failed to initialize Supabase:", error)
+        setIsInitializing(false)
+      })
   }, [])
 
+  useEffect(() => {
+    if (supabase) {
+      loadCategories()
+    }
+  }, [supabase])
+
   const loadCategories = async () => {
+    if (!supabase) return
+
     const { data, error } = await supabase.from("categories").select("*").order("display_order")
 
     if (error) {
@@ -94,6 +112,8 @@ export function CategoryManagement() {
   }
 
   const handleSave = async () => {
+    if (!supabase) return
+
     setIsLoading(true)
     try {
       let imageUrl = formData.image_url
@@ -161,6 +181,8 @@ export function CategoryManagement() {
   }
 
   const handleDelete = async (id: string) => {
+    if (!supabase) return
+
     if (!confirm("Bu kategoriyi silmek istediğinizden emin misiniz?")) return
 
     const { error } = await supabase.from("categories").delete().eq("id", id)
@@ -175,6 +197,17 @@ export function CategoryManagement() {
   }
 
   const colors = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-orange-500", "bg-pink-500", "bg-teal-500"]
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
