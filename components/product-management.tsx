@@ -15,7 +15,6 @@ type Product = {
   price: number
   image_url?: string
   is_active: boolean
-  pre_order_enabled: boolean
 }
 
 type Category = {
@@ -36,7 +35,6 @@ export function ProductManagement() {
     price: "",
     category_id: "",
     image: null as File | null,
-    pre_order_enabled: false,
   })
   const [supabase, setSupabase] = useState<any>(null)
 
@@ -106,7 +104,6 @@ export function ProductManagement() {
         price: product.price.toString(),
         category_id: product.category_id,
         image: null,
-        pre_order_enabled: product.pre_order_enabled || false,
       })
     } else {
       setEditingProduct(null)
@@ -116,7 +113,6 @@ export function ProductManagement() {
         price: "",
         category_id: "",
         image: null,
-        pre_order_enabled: false,
       })
     }
     setIsModalOpen(true)
@@ -131,7 +127,6 @@ export function ProductManagement() {
       price: "",
       category_id: "",
       image: null,
-      pre_order_enabled: false,
     })
   }
 
@@ -166,7 +161,6 @@ export function ProductManagement() {
         category_id: formData.category_id || null,
         image_url: imageUrl,
         is_active: true,
-        pre_order_enabled: formData.pre_order_enabled,
       }
 
       if (editingProduct) {
@@ -375,19 +369,6 @@ export function ProductManagement() {
                     </span>
                   </label>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-4 border border-input rounded-lg">
-                <input
-                  type="checkbox"
-                  id="pre-order-enabled"
-                  checked={formData.pre_order_enabled}
-                  onChange={(e) => setFormData({ ...formData, pre_order_enabled: e.target.checked })}
-                  className="w-4 h-4 rounded border-input"
-                />
-                <label htmlFor="pre-order-enabled" className="text-sm font-medium cursor-pointer">
-                  Ön sipariş alınabilir
-                </label>
               </div>
             </div>
 
