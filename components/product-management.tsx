@@ -15,6 +15,7 @@ type Product = {
   price: number
   image_url?: string
   is_active: boolean
+  order_enabled: boolean
 }
 
 type Category = {
@@ -35,6 +36,7 @@ export function ProductManagement() {
     price: "",
     category_id: "",
     image: null as File | null,
+    order_enabled: false,
   })
   const [supabase, setSupabase] = useState<any>(null)
 
@@ -104,6 +106,7 @@ export function ProductManagement() {
         price: product.price.toString(),
         category_id: product.category_id,
         image: null,
+        order_enabled: product.order_enabled || false,
       })
     } else {
       setEditingProduct(null)
@@ -113,6 +116,7 @@ export function ProductManagement() {
         price: "",
         category_id: "",
         image: null,
+        order_enabled: false,
       })
     }
     setIsModalOpen(true)
@@ -127,6 +131,7 @@ export function ProductManagement() {
       price: "",
       category_id: "",
       image: null,
+      order_enabled: false,
     })
   }
 
@@ -161,6 +166,7 @@ export function ProductManagement() {
         category_id: formData.category_id || null,
         image_url: imageUrl,
         is_active: true,
+        order_enabled: formData.order_enabled,
       }
 
       if (editingProduct) {
@@ -369,6 +375,19 @@ export function ProductManagement() {
                     </span>
                   </label>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-4 border border-input rounded-lg">
+                <input
+                  type="checkbox"
+                  id="order-enabled"
+                  checked={formData.order_enabled}
+                  onChange={(e) => setFormData({ ...formData, order_enabled: e.target.checked })}
+                  className="w-4 h-4 rounded border-input"
+                />
+                <label htmlFor="order-enabled" className="text-sm font-medium cursor-pointer">
+                  Sipariş alınabilir
+                </label>
               </div>
             </div>
 

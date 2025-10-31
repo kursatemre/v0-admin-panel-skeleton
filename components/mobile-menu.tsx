@@ -11,6 +11,7 @@ type Product = {
   description: string | null
   price: number
   image_url: string | null
+  order_enabled: boolean
 }
 
 type Category = {
@@ -136,6 +137,14 @@ export function MobileMenu({
   footerLogoUrl,
 }: MobileMenuProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(categories.map((c) => c.id)))
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [orderForm, setOrderForm] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    quantity: 1,
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -145,6 +154,38 @@ export function MobileMenu({
       newExpanded.add(categoryId)
     }
     setExpandedCategories(newExpanded)
+  }
+
+  const handleOrder = async () => {
+    if (!selectedProduct) return
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: selectedProduct.id,
+          ...orderForm,
+        }),
+      })
+
+      if (!response.ok) throw new Error("Sipariş gönderilemedi")
+
+      alert("Siparişiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.")
+      setSelectedProduct(null)
+      setOrderForm({
+        first_name: "",
+        last_name: "",
+        phone: "",
+        quantity: 1,
+      })
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      alert("Sipariş gönderilirken bir hata oluştu. Lütfen tekrar deneyin.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const patternStyle = getPatternStyle(backgroundPattern, accentColor)
@@ -277,6 +318,19 @@ export function MobileMenu({
                             {product.price.toFixed(2)} ₺
                           </div>
                         </div>
+                        {product.order_enabled && (
+                          <button
+                            onClick={() => setSelectedProduct(product)}
+                            className="mt-3 px-4 py-2 rounded font-medium text-sm transition-opacity hover:opacity-90"
+                            style={{
+                              backgroundColor: accentColor,
+                              color: "#ffffff",
+                              borderRadius: radiusValue,
+                            }}
+                          >
+                            Sipariş Ver
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -320,6 +374,96 @@ export function MobileMenu({
         )}
         <p className="whitespace-pre-line">{footerText}</p>
       </div>
+
+      {/* Order Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b">
+              <h2 className="text-2xl font-bold" style={{ color: productNameColor }}>
+                Sipariş Ver
+              </h2>
+              <p className="text-sm mt-1" style={{ color: productDescColor }}>
+                {selectedProduct.name} - {selectedProduct.price.toFixed(2)} ₺
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Adınız *</label>
+                <input
+                  type="text"
+                  value={orderForm.first_name}
+                  onChange={(e) => setOrderForm({ ...orderForm, first_name: e.target.value })}
+                  placeholder="Adınızı girin"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Soyadınız *</label>
+                <input
+                  type="text"
+                  value={orderForm.last_name}
+                  onChange={(e) => setOrderForm({ ...orderForm, last_name: e.target.value })}
+                  placeholder="Soyadınızı girin"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Telefon Numaranız *</label>
+                <input
+                  type="tel"
+                  value={orderForm.phone}
+                  onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })}
+                  placeholder="05XX XXX XX XX"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Adet *</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={orderForm.quantity}
+                  onChange={(e) => setOrderForm({ ...orderForm, quantity: Number.parseInt(e.target.value) || 1 })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <p className="text-sm font-medium">
+                  Toplam: {(selectedProduct.price * orderForm.quantity).toFixed(2)} ₺
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 p-6 border-t">
+              <button
+                onClick={() => setSelectedProduct(null)}
+                disabled={isSubmitting}
+                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleOrder}
+                disabled={isSubmitting || !orderForm.first_name || !orderForm.last_name || !orderForm.phone}
+                className="px-4 py-2 rounded-lg font-medium text-white"
+                style={{ backgroundColor: accentColor }}
+              >
+                {isSubmitting ? "Gönderiliyor..." : "Sipariş Ver"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

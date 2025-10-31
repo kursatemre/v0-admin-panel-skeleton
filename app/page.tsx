@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { ProductManagement } from "@/components/product-management"
 import { CategoryManagement } from "@/components/category-management"
+import { OrderManagement } from "@/components/order-management"
 import { DisplaySettings } from "@/components/display-settings"
 import { QRGenerator } from "@/components/qr-generator"
 import { Button } from "@/components/ui/button"
@@ -12,7 +13,7 @@ import { LogOut, Monitor, Menu } from "lucide-react"
 
 export default function AdminPanel() {
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState<"products" | "categories" | "settings" | "qr">(
+  const [activeSection, setActiveSection] = useState<"products" | "categories" | "orders" | "settings" | "qr">(
     "products",
   )
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -87,6 +88,7 @@ export default function AdminPanel() {
         <div className="container mx-auto p-6 lg:p-8">
           {activeSection === "products" && <ProductManagement />}
           {activeSection === "categories" && <CategoryManagement />}
+          {activeSection === "orders" && <OrderManagement />}
           {activeSection === "settings" && <DisplaySettings />}
           {activeSection === "qr" && <QRGenerator />}
         </div>
