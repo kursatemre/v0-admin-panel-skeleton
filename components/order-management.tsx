@@ -77,7 +77,7 @@ export function OrderManagement() {
       if (error) throw error
       setOrders(data || [])
     } catch (error) {
-      console.error("Error fetching orders:", error)
+      // Error fetching orders
     } finally {
       setIsLoading(false)
     }
@@ -95,7 +95,7 @@ export function OrderManagement() {
       if (error) throw error
       await fetchOrders()
     } catch (error) {
-      console.error("Error updating order status:", error)
+      // Error updating order status
     }
   }
 

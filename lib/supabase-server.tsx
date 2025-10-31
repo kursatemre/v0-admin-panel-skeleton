@@ -8,8 +8,6 @@ function getSupabaseUrl(): string {
 
   const postgresUrl = process.env.SUPABASE_POSTGRES_URL
   if (postgresUrl) {
-    console.log("[v0] Attempting to extract Supabase URL from:", postgresUrl.replace(/:[^:@]+@/, ":***@"))
-
     // Try multiple patterns to extract project reference
     const patterns = [
       // Pattern 1: postgres.[project-ref].supabase.co or .com
@@ -27,14 +25,9 @@ function getSupabaseUrl(): string {
       if (match && match[1]) {
         const projectRef = match[1]
         const supabaseUrl = `https://${projectRef}.supabase.co`
-        console.log("[v0] Extracted Supabase URL:", supabaseUrl)
         return supabaseUrl
       }
     }
-
-    console.error("[v0] Could not extract project reference from Postgres URL")
-  } else {
-    console.error("[v0] SUPABASE_POSTGRES_URL not found")
   }
 
   throw new Error("Could not determine Supabase URL. Please set NEXT_PUBLIC_SUPABASE_URL environment variable.")

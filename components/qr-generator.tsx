@@ -46,7 +46,7 @@ export function QRGenerator() {
         },
       })
     } catch (error) {
-      console.error("QR kod oluşturma hatası:", error)
+      // QR code generation failed
     }
   }
 

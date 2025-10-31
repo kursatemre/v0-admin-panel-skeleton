@@ -80,7 +80,6 @@ export function DisplaySettings() {
         setIsInitializing(false)
       })
       .catch((error) => {
-        console.error("Failed to initialize Supabase:", error)
         setIsInitializing(false)
       })
   }, [])

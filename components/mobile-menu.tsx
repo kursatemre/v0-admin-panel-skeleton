@@ -181,7 +181,6 @@ export function MobileMenu({
         quantity: 1,
       })
     } catch (error) {
-      console.error("Error submitting order:", error)
       alert("Sipariş gönderilirken bir hata oluştu. Lütfen tekrar deneyin.")
     } finally {
       setIsSubmitting(false)

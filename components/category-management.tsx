@@ -37,7 +37,6 @@ export function CategoryManagement() {
         setIsInitializing(false)
       })
       .catch((error) => {
-        console.error("Failed to initialize Supabase:", error)
         setIsInitializing(false)
       })
   }, [])
@@ -54,7 +53,6 @@ export function CategoryManagement() {
     const { data, error } = await supabase.from("categories").select("*").order("display_order")
 
     if (error) {
-      console.error("[v0] Error loading categories:", error)
       return
     }
 
@@ -119,7 +117,6 @@ export function CategoryManagement() {
       let imageUrl = formData.image_url
 
       if (imageFile) {
-        console.log("[v0] Uploading image:", imageFile.name)
         try {
           const formDataToSend = new FormData()
           formDataToSend.append("file", imageFile)
@@ -136,9 +133,7 @@ export function CategoryManagement() {
 
           const data = await response.json()
           imageUrl = data.url
-          console.log("[v0] Image uploaded successfully:", imageUrl)
         } catch (uploadError) {
-          console.error("[v0] Image upload failed:", uploadError)
           alert("Görsel yüklenirken bir hata oluştu: " + (uploadError as Error).message)
           setIsLoading(false)
           return
@@ -151,29 +146,22 @@ export function CategoryManagement() {
         image_url: imageUrl,
       }
 
-      console.log("[v0] Saving category:", categoryData)
-
       if (editingCategory) {
         const { error } = await supabase.from("categories").update(categoryData).eq("id", editingCategory.id)
 
         if (error) {
-          console.error("[v0] Update error:", error)
           throw error
         }
       } else {
         const { error } = await supabase.from("categories").insert(categoryData)
 
         if (error) {
-          console.error("[v0] Insert error:", error)
           throw error
         }
       }
-
-      console.log("[v0] Category saved successfully")
       await loadCategories()
       handleCloseModal()
     } catch (error) {
-      console.error("[v0] Save error:", error)
       alert("Kategori kaydedilirken bir hata oluştu: " + (error as Error).message)
     } finally {
       setIsLoading(false)
@@ -188,7 +176,6 @@ export function CategoryManagement() {
     const { error } = await supabase.from("categories").delete().eq("id", id)
 
     if (error) {
-      console.error("[v0] Error deleting category:", error)
       alert("Kategori silinirken bir hata oluştu")
       return
     }

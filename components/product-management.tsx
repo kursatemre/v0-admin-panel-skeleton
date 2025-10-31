@@ -46,7 +46,7 @@ export function ProductManagement() {
         setSupabase(client)
       })
       .catch((error) => {
-        console.error("[v0] Failed to initialize Supabase:", error)
+        // Failed to initialize
       })
   }, [])
 
@@ -72,7 +72,6 @@ export function ProductManagement() {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("[v0] Error loading products:", error)
       return
     }
 
@@ -90,7 +89,6 @@ export function ProductManagement() {
     const { data, error } = await supabase.from("categories").select("*").order("display_order")
 
     if (error) {
-      console.error("[v0] Error loading categories:", error)
       return
     }
 
@@ -173,14 +171,12 @@ export function ProductManagement() {
         const { error } = await supabase.from("products").update(productData).eq("id", editingProduct.id)
 
         if (error) {
-          console.error("[v0] Error updating product:", error)
           throw error
         }
       } else {
         const { error } = await supabase.from("products").insert(productData)
 
         if (error) {
-          console.error("[v0] Error inserting product:", error)
           throw error
         }
       }
@@ -188,7 +184,6 @@ export function ProductManagement() {
       await loadProducts()
       handleCloseModal()
     } catch (error: any) {
-      console.error("[v0] Error saving product:", error)
       alert(`Ürün kaydedilirken bir hata oluştu: ${error.message || JSON.stringify(error)}`)
     } finally {
       setIsLoading(false)
@@ -203,7 +198,6 @@ export function ProductManagement() {
     const { error } = await supabase.from("products").update({ is_active: false }).eq("id", id)
 
     if (error) {
-      console.error("[v0] Error deleting product:", error)
       alert("Ürün silinirken bir hata oluştu")
       return
     }
