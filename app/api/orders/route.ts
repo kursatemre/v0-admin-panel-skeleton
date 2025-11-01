@@ -4,7 +4,7 @@ import { getSupabaseServerClient } from "@/lib/supabase-server"
 // GET - Fetch all orders
 export async function GET() {
   try {
-    const supabase = getSupabaseServerClient()
+    const supabase = await getSupabaseServerClient()
 
     const { data, error } = await supabase
       .from("orders")
@@ -84,7 +84,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Geçersiz durum" }, { status: 400 })
     }
 
-    const supabase = getSupabaseServerClient()
+    const supabase = await getSupabaseServerClient()
 
     const { data, error } = await supabase
       .from("orders")
