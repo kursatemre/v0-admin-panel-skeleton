@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Gerekli alanlar eksik" }, { status: 400 })
     }
 
-    const supabase = getSupabaseServerClient()
+    const supabase = await getSupabaseServerClient()
 
     const { data, error } = await supabase
       .from("orders")
